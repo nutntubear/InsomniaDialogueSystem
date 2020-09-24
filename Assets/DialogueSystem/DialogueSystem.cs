@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using InsomniaSystemTypes;
@@ -42,6 +43,7 @@ public class DialogueSystem : MonoBehaviour
 	public bool delayBetweenMessages = false;
 	public float delayTime = 1;
 	public float spaceBetweenMessages = 25;
+	public char regexCharacter = '%';
 
 	bool click = false;
 	[System.NonSerialized]
@@ -151,6 +153,18 @@ public class DialogueSystem : MonoBehaviour
 
 	public virtual void SetChoices (List<Destination> dests, string speaker) {
 		
+	}
+
+	public string ReplaceByMemory (string line) {
+		Regex r = new Regex(System.String.Format(@"{0}(.+?){0}", regexCharacter));
+		MatchCollection mc = r.Matches(line);
+		string tempReplace = "";
+		foreach (Match m in mc) {
+			if (memories.memories.Contains(m.Value.Trim('%'), out tempReplace)) {
+				line = line.Replace(m.Value, tempReplace);
+			}
+		}
+		return line;
 	}
 
 	public void StartConversation (int conversationIndex, string conversationLine) {

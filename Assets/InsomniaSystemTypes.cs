@@ -319,6 +319,29 @@ namespace InsomniaSystemTypes {
 			}
 			return false;
 		}
+		// Contains with an out value, giving the string of the value.
+		public bool Contains (string key, out string val) {
+			for (int i = 0; i < intMemories.Count; ++i) {
+				if (intMemories[i].key == key) {
+					val = key.ToString();
+					return true;
+				}
+			}
+			for (int i = 0; i < stringMemories.Count; ++i) {
+				if (stringMemories[i].key == key){
+					val = key;
+					return true;
+				}
+			}
+			for (int i = 0; i < boolMemories.Count; ++i) {
+				if (boolMemories[i].key == key) {
+					val = key.ToString();
+					return true;
+				}
+			}
+			val = "";
+			return false;
+		}
 		public int GetIntMemoryValue (string key) {
 			for (int i = 0; i < intMemories.Count; ++i) {
 				if (intMemories[i].key == key) {
