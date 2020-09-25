@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEngine.UI;
 using InsomniaSystemTypes;
 
 public class DialogueSystem : MonoBehaviour
@@ -17,32 +16,12 @@ public class DialogueSystem : MonoBehaviour
 
 	[Header("Text")]
 	public TextAsset[] mainConversations;
-	public TextAsset[] altConversations;
 
-	[Header("UI Prefabs")]
-	// For use with systems that create text bubbles/messages.
-	public GameObject message;
-
-	[Header("UI Elements")]
-	// For use with a back-and-forth "RPG" system; showing who is speaking at present.
-	public Text body;
-	public Text speaker;
-	// For use with a text bubble/messaging system; the parents of messages.
-	public RectTransform otherParent;
-	public RectTransform playerParent;
-	// List of choices.
-	public Text[] choiceTexts;
-
+	[Header("UI")]
 	// For enabling/disabling the system at large.
 	public GameObject fullSystem;
 
-	public float bottomYPos;
-
 	[Header("Preferences")]
-	public DialogueMode mode = DialogueMode.Standard;
-	public bool delayBetweenMessages = false;
-	public float delayTime = 1;
-	public float spaceBetweenMessages = 25;
 	public char regexCharacter = '%';
 
 	bool click = false;
@@ -50,48 +29,68 @@ public class DialogueSystem : MonoBehaviour
 	public bool ready = true;
 	bool choices = false;
 	bool usingMemDest = false;
-	int i = 0;
+	[System.NonSerialized]
+	public int i = 0;
 
-	// Temporary variables used in the reading of nodes and their destinations.
+	// Variables used in the reading of dialogue files and their destinations.
+	[System.NonSerialized]
+	public List<Node> currentNodes;
 	Node node;
 	List<Destination> dests = new List<Destination>();
 	List<MemoryDestination> memdests = new List<MemoryDestination>();
 
 	// Node Array creator, reading from a TextAsset.
-	Node[] ReadFromFile (TextAsset file) {
+	List<Node> ReadFromFile (TextAsset file) {
 		string fileText = file.text;
 		string[] lines = fileText.Split('\n');
-		Node[] nodes = new Node[lines.Length];
+		List<Node> nodes = new List<Node>();
 		for (int i = 0; i < lines.Length; ++i) {
-			nodes[i] = JsonUtility.FromJson<Node>(lines[i]);
+			if (lines[i].Length == 0) continue;
+			nodes.Add(JsonUtility.FromJson<Node>(lines[i]));
 		}
+		nodes.Sort(Utilities.SortNode);
 		return nodes;
 	}
 
 	// Node Array creator, reading from a string array (should an array of strings ever
 	// be created from an Insomnia JSON file).
-	Node[] ReadFromArray (string[] lines) {
-		Node[] nodes = new Node[lines.Length];
+	List<Node> ReadFromArray (string[] lines) {
+		List<Node> nodes = new List<Node>();
 		for (int i = 0; i < lines.Length; ++i) {
-			nodes[i] = JsonUtility.FromJson<Node>(lines[i]);
+			nodes.Add(JsonUtility.FromJson<Node>(lines[i]));
 		}
+		nodes.Sort(Utilities.SortNode);
 		return nodes;
 	}
 
-	public void PlayerChoice (int dest, string text) {
-		i = dest;
+	public void PlayerChoice (int choiceID) {
+		i = dests[choiceID].dest;
 		click = true;
 		choices = false;
 	}
 
-	IEnumerator ReadConversation (Node[] nodes) {
+	public string ReplaceByMemory (string line) {
+		Regex r = new Regex(System.String.Format(@"{0}(.+?){0}", regexCharacter));
+		MatchCollection mc = r.Matches(line);
+		string tempReplace = "";
+		foreach (Match m in mc) {
+			if (memories.memories.Contains(m.Value.Trim('%'), out tempReplace)) {
+				line = line.Replace(m.Value, tempReplace);
+			}
+		}
+		return line;
+	}
+
+	IEnumerator ReadConversation (List<Node> nodes) {
+		ResetChoices();
 		i = 0;
+		currentNodes = nodes;
 		while (i != -1) {
 			// Reset any booleans used in reading a node and its destinations.
 			ready = false;
 			usingMemDest = false;
 			node = nodes[i];
-			SetTextBox(node.body, node.speaker);
+			SetTextBox(node.body, node.speaker, node.player);
 			if (node.type == 'b') {
 				// Branching node: Populate lists of memory based choices and standard choices.
 				dests = new List<Destination>();
@@ -118,9 +117,15 @@ public class DialogueSystem : MonoBehaviour
 				}
 				// Set choices, as long as a forced MemoryDestination isn't being used.
 				if (!usingMemDest) {
-					SetChoices(dests, node.speaker);
+					if (dests.Count > 1) {
+						choices = true;
+						SetChoices(dests, node.speaker);
+					} else {
+						i = dests[0].dest;
+					}
 				}
 			} else if (node.type == 'n') {
+				ResetChoices();
 				// Normal node: Set the destination.
 				i = node.destinations[0].dest;
 			} else if (node.type == 'e') {
@@ -145,27 +150,15 @@ public class DialogueSystem : MonoBehaviour
 			yield return new WaitUntil(() => click);
 			click = false;
 		}
+		currentNodes = new List<Node>();
+		End();
 	}
 
-	public virtual void SetTextBox (string body, string speaker) {
-		
-	}
-
-	public virtual void SetChoices (List<Destination> dests, string speaker) {
-		
-	}
-
-	public string ReplaceByMemory (string line) {
-		Regex r = new Regex(System.String.Format(@"{0}(.+?){0}", regexCharacter));
-		MatchCollection mc = r.Matches(line);
-		string tempReplace = "";
-		foreach (Match m in mc) {
-			if (memories.memories.Contains(m.Value.Trim('%'), out tempReplace)) {
-				line = line.Replace(m.Value, tempReplace);
-			}
-		}
-		return line;
-	}
+	// Methods for displaying dialogue, to be overridden in readers.
+	public virtual void SetTextBox (string body, string speaker, bool isPlayer=false) {}
+	public virtual void SetChoices (List<Destination> dests, string speaker) {}
+	public virtual void ResetChoices () {}
+	public virtual void End () {}
 
 	public void StartConversation (int conversationIndex, string conversationLine) {
 		StartCoroutine(ReadConversation(ReadFromFile(mainConversations[conversationIndex])));
@@ -176,6 +169,7 @@ public class DialogueSystem : MonoBehaviour
 	}
 
 	void Update () {
+		// Advances text forward.
 		if (ready && Input.GetMouseButtonUp(0) && !choices) {
 			click = true;
 		}

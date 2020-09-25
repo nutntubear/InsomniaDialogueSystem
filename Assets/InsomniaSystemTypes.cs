@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -19,6 +20,10 @@ namespace InsomniaSystemTypes {
 		public static IntMemory intMemory = new IntMemory();
 		public static StringMemory stringMemory = new StringMemory();
 		public static BoolMemory boolMemory = new BoolMemory();
+
+		public static int SortNode (Node a, Node b) {
+			return a.id.CompareTo(b.id);
+		}
 	}
 
 	/*
@@ -40,12 +45,16 @@ namespace InsomniaSystemTypes {
 		public List<Destination> destinations;
 		public List<Memory> memories;
 
+		static int totalID = 0;
+
 		public Node () {
 			type = 'e';
 			player = false;
 			events = new List<DialogueEvent>();
 			destinations = new List<Destination>();
 			memories = new List<Memory>();
+			id = totalID;
+			totalID++;
 		}
 
 		// SetType sets the char type variable. Run when producing the JSON dialogue file.

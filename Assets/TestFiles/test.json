@@ -1,0 +1,11 @@
+{"id":0,"type":98,"body":"Hey there!","speaker":"Other Person","player":false,"events":[],"destinations":[{"dest":1},{"dest":2}],"memories":[]}
+{"id":1,"type":110,"body":"Hi! How's it going?","speaker":"Player","player":true,"events":[],"destinations":[{"dest":3}],"memories":[]}
+{"id":2,"type":110,"body":"[grumble grumble]","speaker":"Player","player":true,"events":[],"destinations":[{"dest":4}],"memories":[]}
+{"id":3,"type":101,"body":"I'm doing alright, thanks!","speaker":"Other Person","player":false,"events":[],"destinations":[],"memories":[]}
+{"id":4,"type":98,"body":"You alright, pal?","speaker":"Other Person","player":false,"events":[],"destinations":[{"dest":5},{"dest":6},{"dest":7}],"memories":[]}
+{"id":5,"type":101,"body":"Oh, huh? I'm alright.","speaker":"Player","player":true,"events":[],"destinations":[],"memories":[]}
+{"id":6,"type":110,"body":"Don't pal me, buddy!","speaker":"Player","player":true,"events":[],"destinations":[{"dest":8}],"memories":[]}
+{"id":7,"type":101,"body":"[grumble grumble]","speaker":"Player","player":true,"events":[],"destinations":[],"memories":[]}
+{"id":8,"type":110,"body":"Don't buddy me, guy!","speaker":"Other Person","player":false,"events":[],"destinations":[{"dest":9}],"memories":[]}
+{"id":9,"type":110,"body":"Don't guy me, friend!","speaker":"Player","player":true,"events":[],"destinations":[{"dest":10}],"memories":[]}
+{"id":10,"type":101,"body":"Don't friend me, pal!","speaker":"Other Person","player":false,"events":[],"destinations":[],"memories":[]}
