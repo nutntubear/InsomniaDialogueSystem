@@ -9,25 +9,26 @@ public class DialogueSystem : MonoBehaviour
 
 	string temp;
 
-	public enum DialogueMode { Standard, Messaging, Speech, Cinematic };
-
 	public DialogueEventHandler events;
 	public DialogueMemories memories;
 
 	[Header("Text")]
-	public TextAsset[] mainConversations;
+	public TextAsset[] dialogues;
 
 	[Header("UI")]
 	// For enabling/disabling the system at large.
 	public GameObject fullSystem;
 
 	[Header("Preferences")]
+	[Tooltip("A character used for replacing sections of dialogue with memories.")]
 	public char regexCharacter = '%';
 
-	bool click = false;
+	[System.NonSerialized]
+	public bool click = false;
 	[System.NonSerialized]
 	public bool ready = true;
-	bool choices = false;
+	[System.NonSerialized]
+	public bool choices = false;
 	bool usingMemDest = false;
 	[System.NonSerialized]
 	public int i = 0;
@@ -63,12 +64,16 @@ public class DialogueSystem : MonoBehaviour
 		return nodes;
 	}
 
+	// Called by dialogue buttons when a choice is made.
 	public void PlayerChoice (int choiceID) {
 		i = dests[choiceID].dest;
 		click = true;
 		choices = false;
 	}
 
+	// Uses the regexCharacter to identify any sections of text in a dialogue node that should be replaced
+	// by a memory.
+	// Example: regexCharacter = '%'. "My name is %name%." could become "My name is John."
 	public string ReplaceByMemory (string line) {
 		Regex r = new Regex(System.String.Format(@"{0}(.+?){0}", regexCharacter));
 		MatchCollection mc = r.Matches(line);
@@ -81,7 +86,8 @@ public class DialogueSystem : MonoBehaviour
 		return line;
 	}
 
-	IEnumerator ReadConversation (List<Node> nodes) {
+	// An IEnumerator to read through a dialogue file.
+	IEnumerator ReadFile (List<Node> nodes) {
 		ResetChoices();
 		i = 0;
 		currentNodes = nodes;
@@ -97,11 +103,16 @@ public class DialogueSystem : MonoBehaviour
 				memdests = new List<MemoryDestination>();
 				for (int j = 0; j < node.destinations.Count; ++j) {
 					if (memdests.GetType() == Utilities.memoryDestination.GetType()) {
+						// If a memory destination is found, add it to the list of memory destinations.
 						memdests.Add((MemoryDestination)node.destinations[j]);
 					} else {
+						// If it's a normal destination, just add it to the list of destinations.
 						dests.Add(node.destinations[j]);
 					}
 				}
+				// If there are memory destinations, check all of them using the MemoryDictionary's CheckMemory method.
+				// If the MemoryCheck returns true, add it to memDests. If it is true and the memory destination is forced,
+				// set i to point to that memory.
 				if (memdests.Count > 0) {
 					for (int j = 0; j < memdests.Count; ++j) {
 						if (memories.memories.CheckMemory(memdests[i])) {
@@ -146,6 +157,7 @@ public class DialogueSystem : MonoBehaviour
 				}
 			}
 			
+			// Wait until the player continues.
 			ready = true;
 			yield return new WaitUntil(() => click);
 			click = false;
@@ -160,19 +172,8 @@ public class DialogueSystem : MonoBehaviour
 	public virtual void ResetChoices () {}
 	public virtual void End () {}
 
-	public void StartConversation (int conversationIndex, string conversationLine) {
-		StartCoroutine(ReadConversation(ReadFromFile(mainConversations[conversationIndex])));
-	}
-
-	void Start () {
-		StartCoroutine(ReadConversation(ReadFromFile(mainConversations[0])));
-	}
-
-	void Update () {
-		// Advances text forward.
-		if (ready && Input.GetMouseButtonUp(0) && !choices) {
-			click = true;
-		}
+	public virtual void StartReading (int fileIndex) {
+		StartCoroutine(ReadFile(ReadFromFile(dialogues[fileIndex])));
 	}
 
 }

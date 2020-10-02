@@ -277,6 +277,7 @@ namespace InsomniaSystemTypes {
 				SetBoolMemory((BoolMemory)memory);
 			}
 		}
+		// Type Based Memory Setters; called from internal methods suck as SetMemory.
 		void SetIntMemory (IntMemory memory) {
 			for (int i = 0; i < intMemories.Count; ++i) {
 				if (intMemories[i].key == memory.key) {
@@ -305,6 +306,7 @@ namespace InsomniaSystemTypes {
 			boolMemories.Add(memory);
 		}
 
+		// Public Setters; available for other scripts outside of the dialogue system to use.
 		public void SetInt (string name, int val) {
 			this.SetMemory(new IntMemory(name, val));
 		}
@@ -351,6 +353,7 @@ namespace InsomniaSystemTypes {
 			val = "";
 			return false;
 		}
+		// Getters for specific types.
 		public int GetIntMemoryValue (string key) {
 			for (int i = 0; i < intMemories.Count; ++i) {
 				if (intMemories[i].key == key) {

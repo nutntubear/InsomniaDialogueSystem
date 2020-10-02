@@ -6,9 +6,13 @@ using InsomniaSystemTypes;
 public class DialogueEventHandler : MonoBehaviour
 {
 
+	[Tooltip("Events called from dialogue that don't take parameters from dialogue.")]
 	public List<EventPair> events = new List<EventPair>();
+	[Tooltip("Events called from dialogue that can take int parameters from dialogue.")]
 	public List<EventPairInt> intEvents = new List<EventPairInt>();
+	[Tooltip("Events called from dialogue that can take string parameters from dialogue.")]
 	public List<EventPairString> stringEvents = new List<EventPairString>();
+	[Tooltip("Events called from dialogue that can take bool parameters from dialogue.")]
 	public List<EventPairBool> boolEvents = new List<EventPairBool>();
 
 	// Temp event for type checking and use in TriggerEvent.
