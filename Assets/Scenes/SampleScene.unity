@@ -1080,7 +1080,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   events: {fileID: 1550749739}
   memories: {fileID: 1550749741}
-  mainConversations:
+  dialogues:
   - {fileID: 4900000, guid: ed0c1fd7bb1d7654496da9e5cb20507b, type: 3}
   fullSystem: {fileID: 0}
   regexCharacter: 37
