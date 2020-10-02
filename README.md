@@ -3,7 +3,7 @@ An open source, node-based customizable dialogue system for the Unity Engine.
 
 ![Writer and demo preview](https://wlyonsgamedev.com/Images/insomniadialoguesystemclips.gif)
 
-## Features
+## Features (not found in this repo)
 - Node based dialogue files, each node containing information like speaker, body text, destinations, events, and flags to be set, saved, or checked.
 - A visual file writer, allowing for ease of use for writers
 - A base dialogue reader to be implemented and customized for your games
