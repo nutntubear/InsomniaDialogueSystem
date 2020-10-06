@@ -1,5 +1,6 @@
 # InsomniaDialogueSystem
 An open source, node-based customizable dialogue system for the Unity Engine.
+Currently built in 2020.1.7f1.
 
 ![Writer and demo preview](https://wlyonsgamedev.com/Images/insomniadialoguesystemclips.gif)
 
