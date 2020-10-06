@@ -44,6 +44,9 @@ namespace InsomniaSystemTypes {
 		public List<DialogueEvent> events;
 		public List<Destination> destinations;
 		public List<Memory> memories;
+		public string spareData;
+		// Used for visual file writer.
+		public Vector2 position;
 
 		static int totalID = 0;
 
