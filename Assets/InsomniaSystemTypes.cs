@@ -76,6 +76,34 @@ namespace InsomniaSystemTypes {
 			return JsonUtility.ToJson(this);
 		}
 
+		public string ToTextBox () {
+			string line1 = id.ToString() + " - ";
+			line1 += speaker.Substring(0, (int)Mathf.Clamp(11 - line1.Length, 0, speaker.Length));
+			string line2;
+			if (memories.Count > 9) line2 = "9+ Memories";
+			else line2 = memories.Count.ToString() + " Memories";
+			string line3;
+			if (events.Count > 9) line3 = "9+ Events";
+			else line3 = events.Count.ToString() + " Events";
+			string line4 = "";
+			int bodyLength = body.Length;
+			bool addEllipsis = false;
+			if (body.Length > 33) {
+				bodyLength = 30;
+				addEllipsis = true;
+			}
+			for (int i = 1; i <= body.Length; ++i) {
+				line4 += body[i - 1];
+				if (i % 11 == 0) {
+					line4 += "\n";
+				}
+			}
+			if (addEllipsis) {
+				line4 += "...";
+			}
+			return System.String.Format("{0}\n{1}\n{2}\n{3}", line1, line2, line3, line4);
+		}
+
 	}
 
 	/*
