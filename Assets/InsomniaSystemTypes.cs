@@ -48,16 +48,12 @@ namespace InsomniaSystemTypes {
 		// Used for visual file writer.
 		public Vector2 position;
 
-		static int totalID = 0;
-
 		public Node () {
 			type = 'e';
 			player = false;
 			events = new List<DialogueEvent>();
 			destinations = new List<Destination>();
 			memories = new List<Memory>();
-			id = totalID;
-			totalID++;
 		}
 
 		// SetType sets the char type variable. Run when producing the JSON dialogue file.
@@ -74,6 +70,34 @@ namespace InsomniaSystemTypes {
 		public string SaveNode () {
 			SetType();
 			return JsonUtility.ToJson(this);
+		}
+
+		public string ToTextBox () {
+			string line1 = id.ToString() + " - ";
+			line1 += speaker.Substring(0, (int)Mathf.Clamp(11 - line1.Length, 0, speaker.Length));
+			string line2;
+			if (memories.Count > 9) line2 = "9+ Memories";
+			else line2 = memories.Count.ToString() + " Memories";
+			string line3;
+			if (events.Count > 9) line3 = "9+ Events";
+			else line3 = events.Count.ToString() + " Events";
+			string line4 = "";
+			int bodyLength = body.Length;
+			bool addEllipsis = false;
+			if (bodyLength > 33) {
+				bodyLength = 30;
+				addEllipsis = true;
+			}
+			for (int i = 1; i <= bodyLength; ++i) {
+				line4 += body[i - 1];
+				if (i % 11 == 0) {
+					line4 += "\n";
+				}
+			}
+			if (addEllipsis) {
+				line4 += "...";
+			}
+			return System.String.Format("{0}\n{1}\n{2}\n{3}", line1, line2, line3, line4);
 		}
 
 	}
@@ -193,22 +217,54 @@ namespace InsomniaSystemTypes {
 		public string memoryKey;
 		public string checkCode = "eq";
 		public bool forced = false;
-
-		public MemoryDestination (int dest_=-1) {
-			dest = dest_;
-		}
 	}
 	[System.Serializable]
 	public class MemoryDestinationInt : MemoryDestination {
 		public int value;
+
+		public MemoryDestinationInt (int dest_=-1) {
+			dest = dest_;
+		}
+
+		public MemoryDestinationInt (Destination c) {
+			dest = c.dest;
+			if (c.GetType() == Utilities.memoryDestination.GetType()) {
+				memoryKey = ((MemoryDestination)c).memoryKey;
+				checkCode = "=";
+			}
+		}
 	}
 	[System.Serializable]
 	public class MemoryDestinationString : MemoryDestination {
 		public string value;
+
+		public MemoryDestinationString (int dest_=-1) {
+			dest = dest_;
+		}
+
+		public MemoryDestinationString (Destination c) {
+			dest = c.dest;
+			if (c.GetType() == Utilities.memoryDestination.GetType()) {
+				memoryKey = ((MemoryDestination)c).memoryKey;
+				checkCode = "=";
+			}
+		}
 	}
 	[System.Serializable]
 	public class MemoryDestinationBool : MemoryDestination {
 		public bool value;
+
+		public MemoryDestinationBool (int dest_=-1) {
+			dest = dest_;
+		}
+
+		public MemoryDestinationBool (Destination c) {
+			dest = c.dest;
+			if (c.GetType() == Utilities.memoryDestination.GetType()) {
+				memoryKey = ((MemoryDestination)c).memoryKey;
+				checkCode = "=";
+			}
+		}
 	}
 
 	/*
