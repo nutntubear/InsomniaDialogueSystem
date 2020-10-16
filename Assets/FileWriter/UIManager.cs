@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using InsomniaSystemTypes;
 
 public class UIManager : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class UIManager : MonoBehaviour
 	public bool paused = false;
 	public string mode = "";
 	int lifted = -1;
+	int showing = -1;
 	Vector3 liftedDepth = new Vector3(0, 0, -1);
 
 	public NodeManager nodes;
@@ -21,9 +23,13 @@ public class UIManager : MonoBehaviour
 	public Button deleteNode;
 
 	[Header("Node General UI")]
+	public GameObject nodeGeneral;
 	public Text nodeID;
+	public InputField speaker;
+	public InputField body;
 
 	[Header("Node Property UI")]
+	public GameObject nodeSettings;
 	public List<GameObject> sections;
 	public List<Image> sectionButtons;
 
@@ -33,6 +39,12 @@ public class UIManager : MonoBehaviour
 
 	[Header("UI Lists")]
 	public List<Image> buttons;
+	InputField[] fields;
+
+	[Header("UI Objects")]
+	public GameObject destinationTemplate;
+	public GameObject memoryTemplate;
+	public GameObject eventTemplate;
 
 	public void SetActiveButton (Image button) {
 		SetAvailableButtons();
@@ -48,7 +60,7 @@ public class UIManager : MonoBehaviour
 	}
 
 	public void NewFile () {
-
+		UnityEngine.SceneManagement.SceneManager.LoadScene("main");
 	}
 
 	public void AddNode () {
@@ -98,6 +110,13 @@ public class UIManager : MonoBehaviour
 
 	}
 
+	public void UpdateNode () {
+		if (showing == -1) return; // This should never happen, but just in case.
+		nodes.nodes[showing].node.speaker = speaker.text;
+		nodes.nodes[showing].node.body = body.text;
+		nodes.nodes[showing].SetText();
+	}
+
 	public void SwitchNode () {
 
 	}
@@ -114,12 +133,20 @@ public class UIManager : MonoBehaviour
 		}
 	}
 
+	bool IsTyping () {
+		for (int i = 0; i < fields.Length; ++i) {
+			if (fields[i].isFocused) return true;
+		}
+		return false;
+	}
+
 	void Start () {
 		SwitchTab(0);
+		fields = Resources.FindObjectsOfTypeAll<InputField>();
 	}
 
 	void Update () {
-		if (Input.GetKeyDown("space") && !paused) {
+		if (Input.GetKeyDown("space") && !paused && !IsTyping()) {
 			nodePanel.SetActive(!nodePanel.activeSelf);
 		}
 		if (Input.GetKeyDown("escape")) {
@@ -132,7 +159,6 @@ public class UIManager : MonoBehaviour
 		// Mouse control:
 		Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		if (Input.GetMouseButtonDown(1)) {
-			
 			if (mode == "add") {
 				if (nodes.CreateNode(mousePos)) {
 					mode = "";
@@ -149,7 +175,19 @@ public class UIManager : MonoBehaviour
 					SetAvailableButtons();
 				}
 			} else if (mode == "") {
-				nodes.SelectNode(mousePos);
+				int selected = nodes.SelectNode(mousePos);
+				if (showing != selected) {
+					if (selected == -1) {
+						nodeGeneral.SetActive(false);
+						nodeSettings.SetActive(false);
+					} else {
+						nodeGeneral.SetActive(true);
+						nodeSettings.SetActive(true);
+						Node node = nodes.nodes[selected].node;
+						nodeID.text = node.id.ToString();
+					}
+					showing = selected;
+				}
 			}
 		} else if (Input.GetMouseButtonDown(2)) {
 			if (mode == "") {

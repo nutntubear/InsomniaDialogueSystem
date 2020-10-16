@@ -70,10 +70,4 @@ public class NodeManager : MonoBehaviour
 		return false;
 	}
 
-	public void UpdateNode () {
-		if (selected != -1) {
-			nodes[selected].SetText();
-		}
-	}
-
 }

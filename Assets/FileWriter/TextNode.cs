@@ -6,14 +6,18 @@ using InsomniaSystemTypes;
 public class TextNode : MonoBehaviour
 {
 
+	static int id = 0;
+
 	public Node node;
 	public TextMesh text;
 	public GameObject shadow;
-	//[HideInInspector]
+	[HideInInspector]
 	public Bounds bounds;
 	
 	public void Setup (Vector3 pos) {
 		node = new Node();
+		node.id = id;
+		id++;
 		node.position = pos;
 		bounds = GetComponent<SpriteRenderer>().bounds;
 	}
