@@ -6,7 +6,7 @@ using InsomniaSystemTypes;
 public class TextNode : MonoBehaviour
 {
 
-	static int id = 0;
+	public static int id = 0;
 
 	public Node node;
 	public TextMesh text;

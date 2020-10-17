@@ -15,6 +15,9 @@ public class CameraControl : MonoBehaviour
 	public float zoomRate = 1.5f;
 	public float planeSize = 1000;
 
+	[HideInInspector]
+	public bool hoveringOver = false;
+
 	Vector2 start; Vector2 current; Vector2 end;
 
 	void Start () {
@@ -25,7 +28,7 @@ public class CameraControl : MonoBehaviour
 	}
 
 	void Update () {
-		if (uim.paused) return;
+		if (uim.paused || hoveringOver) return;
 		if (Input.mouseScrollDelta.y != 0) {
 			// Camera zooming.
 			currentZoom += Input.mouseScrollDelta.y * Time.deltaTime * -zoomRate;

@@ -9,6 +9,7 @@ public class DestinationObject : MonoBehaviour
 {
 
 	public Text destinationNode;
+	public Dropdown memoryType;
 	public InputField memoryName;
 	public InputField memoryValue;
 	public Dropdown memoryValueBoolean;
@@ -76,15 +77,15 @@ public class DestinationObject : MonoBehaviour
 		currentDest = dest;
 		Type destinationType = dest.GetType();
 		if (destinationType == Utilities.memoryDestinationInt.GetType()) {
-			SwitchByInt(1);
+			memoryType.value = 1;
 			memoryName.text = ((MemoryDestinationInt)dest).memoryKey;
 			memoryValue.text = ((MemoryDestinationInt)dest).value.ToString();
 		} else if (destinationType == Utilities.memoryDestinationString.GetType()) {
-			SwitchByInt(2);
+			memoryType.value = 2;
 			memoryName.text = ((MemoryDestinationString)dest).memoryKey;
 			memoryValue.text = ((MemoryDestinationString)dest).value;
 		} else if (destinationType == Utilities.memoryDestinationBool.GetType()) {
-			SwitchByInt(3);
+			memoryType.value = 3;
 			memoryName.text = ((MemoryDestinationBool)dest).memoryKey;
 			if (((MemoryDestinationBool)dest).value) {
 				memoryValueBoolean.value = 0;

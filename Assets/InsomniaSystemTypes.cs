@@ -56,6 +56,14 @@ namespace InsomniaSystemTypes {
 			memories = new List<Memory>();
 		}
 
+		public bool HasDestination (int dest) {
+			if (dest == id) return true;
+			for (int i = 0; i < destinations.Count; ++i) {
+				if (destinations[i].dest == dest) return true;
+			}
+			return false;
+		}
+
 		// SetType sets the char type variable. Run when producing the JSON dialogue file.
 		void SetType () {
 			if (destinations.Count == 0) {
@@ -211,6 +219,7 @@ namespace InsomniaSystemTypes {
 		public Destination (int dest_=-1) {
 			dest = dest_;
 		}
+
 	}
 	[System.Serializable]
 	public class MemoryDestination : Destination {

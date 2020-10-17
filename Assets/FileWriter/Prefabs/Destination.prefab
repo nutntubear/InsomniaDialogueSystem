@@ -923,8 +923,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1.29, y: -30}
-  m_SizeDelta: {x: 313.61996, y: 60}
+  m_AnchoredPosition: {x: -20.359, y: -30}
+  m_SizeDelta: {x: 275.48282, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5278036086161280235
 CanvasRenderer:
@@ -1852,6 +1852,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destinationNode: {fileID: 7988236041077363036}
+  memoryType: {fileID: 7988236042485857880}
   memoryName: {fileID: 7988236042213519268}
   memoryValue: {fileID: 3327789838046725758}
   memoryValueBoolean: {fileID: 254974461963643938}

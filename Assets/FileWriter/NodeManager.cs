@@ -7,6 +7,8 @@ public class NodeManager : MonoBehaviour
 {
 
 	public List<TextNode> nodes = new List<TextNode>();
+	[HideInInspector]
+	public List<DestinationObject> destinations = new List<DestinationObject>();
 	public GameObject nodePrefab;
 
 	// Temp and hidden
@@ -38,11 +40,33 @@ public class NodeManager : MonoBehaviour
 	}
 
 	public bool DeleteNode (Vector2 pos) {
+		int id = -1;
+		if (!CheckInsideNode(pos, ref id)) return false;
+		// Remove all of the destinations that lead to this node.
+		for (int i = 0; i < nodes.Count; ++i) {
+			for (int j = 0; j < nodes[i].node.destinations.Count; ++j) {
+				if (nodes[i].node.destinations[j].dest == id) {
+					nodes[i].node.destinations.RemoveAt(j);
+					j--;
+				}
+			}
+		}
+		// Decrement any node ids that are higher than the node removed.
+		for (int i = 0; i < nodes.Count; ++i) {
+			if (nodes[i].node.id > id) {
+				nodes[i].node.id--;
+			}
+		}
+		Destroy(nodes[id].gameObject);
+		nodes.RemoveAt(id);
+		TextNode.id--;
 		return true;
 	}
 
-	public bool AddDestination (Vector2 pos) {
-		return true;
+	public int AddDestination (Vector2 pos) {
+		int id = -1;
+		CheckInsideNode(pos, ref id);
+		return id;
 	}
 
 	public int SelectNode (Vector2 pos) {
@@ -68,6 +92,14 @@ public class NodeManager : MonoBehaviour
 			return true;
 		}
 		return false;
+	}
+
+	public void UpdateDestinations (int node) {
+		if (node == -1) return;
+		nodes[node].node.destinations = new List<Destination>();
+		for (int i = 0; i < destinations.Count; ++i) {
+			nodes[node].node.destinations.Add(destinations[i].currentDest);
+		}
 	}
 
 }

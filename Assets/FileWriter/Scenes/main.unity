@@ -645,6 +645,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1138990294}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: DeleteNode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &196978638
 GameObject:
   m_ObjectHideFlags: 0
@@ -820,7 +832,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &270092922
 RectTransform:
   m_ObjectHideFlags: 0
@@ -929,6 +941,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1138990294}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: SetAvailableButtons
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1138990294}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: DeleteDestination
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1322,6 +1346,18 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 538506899}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1138990294}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: AddDestination
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -2597,6 +2633,7 @@ MonoBehaviour:
   maxZoom: 20
   zoomRate: 50
   planeSize: 50
+  hoveringOver: 0
 --- !u!114 &1138990294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2609,6 +2646,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ec33a6aca278ee4e940ee167adf5159, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  paused: 0
   mode: 
   nodes: {fileID: 1138990296}
   pauseScreen: {fileID: 844181347}
@@ -2630,6 +2668,7 @@ MonoBehaviour:
   - {fileID: 1328329363}
   - {fileID: 628350793}
   - {fileID: 1660635238}
+  destinationList: {fileID: 1397989006}
   enabledButton: {r: 1, g: 1, b: 1, a: 1}
   disabledButton: {r: 0.85098046, g: 0.85098046, b: 0.85098046, a: 1}
   buttons:
@@ -2667,6 +2706,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nodes: []
+  destinations: []
   nodePrefab: {fileID: 6858244179621644970, guid: 1f2c1d4c0c1434f46a701c7d22aa284c,
     type: 3}
 --- !u!1 &1160188309
@@ -3162,7 +3202,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1431364246
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4395,6 +4435,7 @@ GameObject:
   - component: {fileID: 1694974875}
   - component: {fileID: 1694974877}
   - component: {fileID: 1694974876}
+  - component: {fileID: 1694974878}
   m_Layer: 5
   m_Name: NodePanel
   m_TagString: Untagged
@@ -4463,6 +4504,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1694974874}
   m_CullTransparentMesh: 0
+--- !u!114 &1694974878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1694974874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f06e5b25f8eb424298eac64bb0e3b4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  control: {fileID: 1138990293}
 --- !u!1 &1797189360
 GameObject:
   m_ObjectHideFlags: 0

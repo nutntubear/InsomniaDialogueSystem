@@ -7,8 +7,9 @@ using InsomniaSystemTypes;
 public class UIManager : MonoBehaviour
 {
 
-	[System.NonSerialized]
+	[HideInInspector]
 	public bool paused = false;
+	[HideInInspector]
 	public string mode = "";
 	int lifted = -1;
 	int showing = -1;
@@ -32,6 +33,7 @@ public class UIManager : MonoBehaviour
 	public GameObject nodeSettings;
 	public List<GameObject> sections;
 	public List<Image> sectionButtons;
+	public RectTransform destinationList;
 
 	[Header("Other Settings")]
 	public Color enabledButton;
@@ -41,7 +43,7 @@ public class UIManager : MonoBehaviour
 	public List<Image> buttons;
 	InputField[] fields;
 
-	[Header("UI Objects")]
+	[Header("UI Templates")]
 	public GameObject destinationTemplate;
 	public GameObject memoryTemplate;
 	public GameObject eventTemplate;
@@ -90,6 +92,17 @@ public class UIManager : MonoBehaviour
 		}
 	}
 
+	void AddDestinationObject (Destination dest, int destinationIndex) {
+		if ((destinationIndex + 1) * 120 >= destinationList.sizeDelta.y) {
+			destinationList.sizeDelta = new Vector2(0, (destinationIndex + 1) * 120);
+			destinationList.anchoredPosition = new Vector2(0, -destinationList.sizeDelta.y / 2);
+		}
+		Transform newDest = Instantiate(destinationTemplate, destinationList).transform;
+		newDest.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -60 - 120 * destinationIndex);
+		newDest.GetComponent<DestinationObject>().Setup(dest);
+		nodes.destinations.Add(newDest.GetComponent<DestinationObject>());
+	}
+
 	public void DeleteDestination () {
 
 	}
@@ -117,8 +130,28 @@ public class UIManager : MonoBehaviour
 		nodes.nodes[showing].SetText();
 	}
 
-	public void SwitchNode () {
-
+	public void SwitchNode (int id) {
+		if (id == -1) {
+			nodeGeneral.SetActive(false);
+			nodeSettings.SetActive(false);
+		} else {
+			int i = 0;
+			nodeGeneral.SetActive(true);
+			nodeSettings.SetActive(true);
+			Node node = nodes.nodes[id].node;
+			nodeID.text = node.id.ToString();
+			speaker.text = node.speaker;
+			body.text = node.body;
+			// Clear destinations...
+			foreach (Transform child in destinationList.transform) {
+				Destroy(child.gameObject);
+			}
+			nodes.destinations = new List<DestinationObject>();
+			// ...and add the new ones.
+			for (i = 0; i < node.destinations.Count; ++i) {
+				AddDestinationObject(node.destinations[i], i);
+			}
+		}
 	}
 
 	public void SwitchTab (int id) {
@@ -168,24 +201,20 @@ public class UIManager : MonoBehaviour
 				if (nodes.DeleteNode(mousePos)) {
 					mode = "";
 					SetAvailableButtons();
+					SwitchNode(-1);
 				}
 			} else if (mode == "addDest") {
-				if (nodes.AddDestination(mousePos)) {
+				int dest = nodes.AddDestination(mousePos);
+				if (dest != -1 && !nodes.nodes[showing].node.HasDestination(dest)) {
 					mode = "";
 					SetAvailableButtons();
+					AddDestinationObject(new Destination(dest), nodes.nodes[showing].node.destinations.Count);
 				}
 			} else if (mode == "") {
+				nodes.UpdateDestinations(showing);
 				int selected = nodes.SelectNode(mousePos);
 				if (showing != selected) {
-					if (selected == -1) {
-						nodeGeneral.SetActive(false);
-						nodeSettings.SetActive(false);
-					} else {
-						nodeGeneral.SetActive(true);
-						nodeSettings.SetActive(true);
-						Node node = nodes.nodes[selected].node;
-						nodeID.text = node.id.ToString();
-					}
+					SwitchNode(selected);
 					showing = selected;
 				}
 			}
