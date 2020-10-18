@@ -98,6 +98,7 @@ public class NodeManager : MonoBehaviour
 		if (node == -1) return;
 		nodes[node].node.destinations = new List<Destination>();
 		for (int i = 0; i < destinations.Count; ++i) {
+			destinations[i].UpdateMemory();
 			nodes[node].node.destinations.Add(destinations[i].currentDest);
 		}
 	}

@@ -27,6 +27,7 @@ public class DestinationObject : MonoBehaviour
 	}
 
 	public void UpdateMemory () {
+		if (currentDest.GetType() == Utilities.destination.GetType()) return;
 		((MemoryDestination)currentDest).memoryKey = memoryName.text;
 		((MemoryDestination)currentDest).checkCode = allChecks[check.value].text;
 		((MemoryDestination)currentDest).forced = forceDestination.isOn;
@@ -36,8 +37,10 @@ public class DestinationObject : MonoBehaviour
 			((MemoryDestinationInt)currentDest).value = attempt;
 		} else if (currentDest.GetType() == Utilities.memoryDestinationString.GetType()) {
 			((MemoryDestinationString)currentDest).value = memoryValue.text;
-		} else {
+		} else if (currentDest.GetType() == Utilities.memoryDestinationBool.GetType()) {
+			Debug.Log((memoryValueBoolean.value == 0));
 			((MemoryDestinationBool)currentDest).value = (memoryValueBoolean.value == 0);
+			Debug.Log(((MemoryDestinationBool)currentDest).value);
 		}
 	}
 
