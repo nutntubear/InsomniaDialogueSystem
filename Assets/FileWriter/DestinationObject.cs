@@ -16,8 +16,8 @@ public class DestinationObject : MonoBehaviour
 	public Dropdown check;
 	public Toggle forceDestination;
 
-	List<Dropdown.OptionData> allChecks = new List<Dropdown.OptionData>();
-	List<Dropdown.OptionData> equalsOnly = new List<Dropdown.OptionData>();
+	static List<Dropdown.OptionData> allChecks = new List<Dropdown.OptionData>();
+	static List<Dropdown.OptionData> equalsOnly = new List<Dropdown.OptionData>();
 
 	[HideInInspector]
 	public Destination currentDest = new Destination();
@@ -38,9 +38,7 @@ public class DestinationObject : MonoBehaviour
 		} else if (currentDest.GetType() == Utilities.memoryDestinationString.GetType()) {
 			((MemoryDestinationString)currentDest).value = memoryValue.text;
 		} else if (currentDest.GetType() == Utilities.memoryDestinationBool.GetType()) {
-			Debug.Log((memoryValueBoolean.value == 0));
 			((MemoryDestinationBool)currentDest).value = (memoryValueBoolean.value == 0);
-			Debug.Log(((MemoryDestinationBool)currentDest).value);
 		}
 	}
 
@@ -83,10 +81,12 @@ public class DestinationObject : MonoBehaviour
 			memoryType.value = 1;
 			memoryName.text = ((MemoryDestinationInt)dest).memoryKey;
 			memoryValue.text = ((MemoryDestinationInt)dest).value.ToString();
+			forceDestination.isOn = ((MemoryDestination)dest).forced;
 		} else if (destinationType == Utilities.memoryDestinationString.GetType()) {
 			memoryType.value = 2;
 			memoryName.text = ((MemoryDestinationString)dest).memoryKey;
 			memoryValue.text = ((MemoryDestinationString)dest).value;
+			forceDestination.isOn = ((MemoryDestination)dest).forced;
 		} else if (destinationType == Utilities.memoryDestinationBool.GetType()) {
 			memoryType.value = 3;
 			memoryName.text = ((MemoryDestinationBool)dest).memoryKey;
@@ -95,6 +95,7 @@ public class DestinationObject : MonoBehaviour
 			} else {
 				memoryValueBoolean.value = 1;
 			}
+			forceDestination.isOn = ((MemoryDestination)dest).forced;
 		} else {
 			SwitchByInt(0);
 		}
@@ -102,12 +103,14 @@ public class DestinationObject : MonoBehaviour
 	}
 
 	void Start () {
-		allChecks.Add(new Dropdown.OptionData("="));
-		allChecks.Add(new Dropdown.OptionData(">"));
-		allChecks.Add(new Dropdown.OptionData("<"));
-		allChecks.Add(new Dropdown.OptionData(">="));
-		allChecks.Add(new Dropdown.OptionData("<="));
-		equalsOnly.Add(new Dropdown.OptionData("="));
+		if (allChecks.Count == 0) {
+			allChecks.Add(new Dropdown.OptionData("="));
+			allChecks.Add(new Dropdown.OptionData(">"));
+			allChecks.Add(new Dropdown.OptionData("<"));
+			allChecks.Add(new Dropdown.OptionData(">="));
+			allChecks.Add(new Dropdown.OptionData("<="));
+			equalsOnly.Add(new Dropdown.OptionData("="));
+		}
 	}
 
 }

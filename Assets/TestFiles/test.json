@@ -1,11 +1,8 @@
-{"id":0,"type":98,"body":"Hey there!","speaker":"Other Person","player":false,"events":[],"destinations":[{"dest":1},{"dest":2}],"memories":[]}
-{"id":1,"type":110,"body":"Hi! How's it going?","speaker":"Player","player":true,"events":[],"destinations":[{"dest":3}],"memories":[]}
-{"id":2,"type":110,"body":"[grumble grumble]","speaker":"Player","player":true,"events":[],"destinations":[{"dest":4}],"memories":[]}
-{"id":3,"type":101,"body":"I'm doing alright, thanks!","speaker":"Other Person","player":false,"events":[],"destinations":[],"memories":[]}
-{"id":4,"type":98,"body":"You alright, pal?","speaker":"Other Person","player":false,"events":[],"destinations":[{"dest":5},{"dest":6},{"dest":7}],"memories":[]}
-{"id":5,"type":101,"body":"Oh, huh? I'm alright.","speaker":"Player","player":true,"events":[],"destinations":[],"memories":[]}
-{"id":6,"type":110,"body":"Don't pal me, buddy!","speaker":"Player","player":true,"events":[],"destinations":[{"dest":8}],"memories":[]}
-{"id":7,"type":101,"body":"[grumble grumble]","speaker":"Player","player":true,"events":[],"destinations":[],"memories":[]}
-{"id":8,"type":110,"body":"Don't buddy me, guy!","speaker":"Other Person","player":false,"events":[],"destinations":[{"dest":9}],"memories":[]}
-{"id":9,"type":110,"body":"Don't guy me, friend!","speaker":"Player","player":true,"events":[],"destinations":[{"dest":10}],"memories":[]}
-{"id":10,"type":101,"body":"Don't friend me, pal!","speaker":"Other Person","player":false,"events":[],"destinations":[],"memories":[]}
+{"id":0,"type":98,"body":"Let's see...","speaker":"Speaker","player":false,"events":[],"destinations":[{"dest":1,"memoryKey":"money","checkCode":">","forced":true,"value":10},{"dest":2}],"memories":[],"spareData":"","position":{"x":-1.936363935470581,"y":2.7636361122131349}}
+{"id":1,"type":98,"body":"...you have some money...","speaker":"Speaker","player":false,"events":[],"destinations":[{"dest":3,"memoryKey":"name","checkCode":"=","forced":true,"value":"Bob"},{"dest":4}],"memories":[],"spareData":"","position":{"x":-1.936363935470581,"y":-1.0000003576278687}}
+{"id":2,"type":98,"body":"...you have no money...","speaker":"Speaker","player":false,"events":[],"destinations":[{"dest":3,"memoryKey":"name","checkCode":"=","forced":true,"value":"Bob"},{"dest":4}],"memories":[],"spareData":"","position":{"x":2.718181610107422,"y":-1.0181818008422852}}
+{"id":3,"type":98,"body":"...your name is Bob...","speaker":"Speaker","player":false,"events":[],"destinations":[{"dest":5,"memoryKey":"dead","checkCode":"=","forced":true,"value":false},{"dest":6}],"memories":[],"spareData":"","position":{"x":-2.063636302947998,"y":-5.418181896209717}}
+{"id":4,"type":98,"body":"...I do not know your name...","speaker":"Speaker","player":false,"events":[],"destinations":[{"dest":5,"memoryKey":"dead","checkCode":"=","forced":true,"value":false},{"dest":6}],"memories":[],"spareData":"","position":{"x":2.918181896209717,"y":-5.472727298736572}}
+{"id":5,"type":110,"body":"...and you are not dead.","speaker":"Speaker","player":false,"events":[],"destinations":[{"dest":7}],"memories":[],"spareData":"","position":{"x":-2.203587770462036,"y":-9.488581657409668}}
+{"id":6,"type":110,"body":"...and you are dead.","speaker":"Speaker","player":false,"events":[],"destinations":[{"dest":7}],"memories":[],"spareData":"","position":{"x":2.924011707305908,"y":-9.443204879760743}}
+{"id":7,"type":101,"body":"Interesting.","speaker":"Speaker","player":false,"events":[],"destinations":[],"memories":[],"spareData":"","position":{"x":0.45096635818481448,"y":-13.52713394165039}}

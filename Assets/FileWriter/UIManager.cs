@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,8 +18,10 @@ public class UIManager : MonoBehaviour
 
 	public NodeManager nodes;
 
-	[Header("Universal UI")]
+	[Header("Pause Screen UI")]
 	public GameObject pauseScreen;
+
+	[Header("Universal UI")]
 	public GameObject nodePanel;
 	public Button addNode;
 	public Button deleteNode;
@@ -63,6 +66,18 @@ public class UIManager : MonoBehaviour
 
 	public void NewFile () {
 		UnityEngine.SceneManagement.SceneManager.LoadScene("main");
+	}
+
+	public void SaveFile () {
+		string writeToFile = "";
+		for (int i = 0; i < nodes.nodes.Count; ++i) {
+			writeToFile += nodes.nodes[i].node.SaveNode() + "\n";
+		}
+		string path = Application.dataPath + "/TestFiles/";
+		if (!Directory.Exists(path)) {
+			Directory.CreateDirectory(path);
+		}
+		File.WriteAllText(path + "test" + ".json", writeToFile);
 	}
 
 	public void AddNode () {
@@ -208,7 +223,7 @@ public class UIManager : MonoBehaviour
 				if (dest != -1 && !nodes.nodes[showing].node.HasDestination(dest)) {
 					mode = "";
 					SetAvailableButtons();
-					AddDestinationObject(new Destination(dest), nodes.nodes[showing].node.destinations.Count);
+					AddDestinationObject(new Destination(dest), nodes.destinations.Count);
 				}
 			} else if (mode == "") {
 				nodes.UpdateDestinations(showing);

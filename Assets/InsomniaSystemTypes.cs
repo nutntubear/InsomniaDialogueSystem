@@ -24,6 +24,7 @@ namespace InsomniaSystemTypes {
 		public static int SortNode (Node a, Node b) {
 			return a.id.CompareTo(b.id);
 		}
+
 	}
 
 	/*
@@ -77,7 +78,28 @@ namespace InsomniaSystemTypes {
 		// Returns a JSON formatted string containing the Node information.
 		public string SaveNode () {
 			SetType();
-			return JsonUtility.ToJson(this);
+			Type checkType;
+			string destinationsString = "";
+			for (int i = 0; i < destinations.Count; ++i) {
+				checkType = destinations[i].GetType();
+				if (checkType == Utilities.memoryDestinationInt.GetType()) {
+					destinationsString += JsonUtility.ToJson((MemoryDestinationInt)destinations[i]);
+				} else if (checkType == Utilities.memoryDestinationString.GetType()) {
+					destinationsString += JsonUtility.ToJson((MemoryDestinationString)destinations[i]);
+				} else if (checkType == Utilities.memoryDestinationBool.GetType()) {
+					destinationsString += JsonUtility.ToJson((MemoryDestinationBool)destinations[i]);
+				} else {
+					destinationsString += JsonUtility.ToJson(destinations[i]);
+				}
+				if (i != destinations.Count - 1) {
+					destinationsString += ",";
+				}
+			}
+			destinations = new List<Destination>();
+			destinations.Add(new Destination(-1));
+			string jsonText = JsonUtility.ToJson(this);
+			jsonText = jsonText.Replace("{\"dest\":-1}", destinationsString);
+			return jsonText;
 		}
 
 		public string ToTextBox () {
@@ -223,12 +245,16 @@ namespace InsomniaSystemTypes {
 	}
 	[System.Serializable]
 	public class MemoryDestination : Destination {
+		[SerializeField]
 		public string memoryKey;
+		[SerializeField]
 		public string checkCode = "eq";
+		[SerializeField]
 		public bool forced = false;
 	}
 	[System.Serializable]
 	public class MemoryDestinationInt : MemoryDestination {
+		[SerializeField]
 		public int value;
 
 		public MemoryDestinationInt (int dest_=-1) {
@@ -245,6 +271,7 @@ namespace InsomniaSystemTypes {
 	}
 	[System.Serializable]
 	public class MemoryDestinationString : MemoryDestination {
+		[SerializeField]
 		public string value;
 
 		public MemoryDestinationString (int dest_=-1) {
@@ -261,6 +288,7 @@ namespace InsomniaSystemTypes {
 	}
 	[System.Serializable]
 	public class MemoryDestinationBool : MemoryDestination {
+		[SerializeField]
 		public bool value;
 
 		public MemoryDestinationBool (int dest_=-1) {
@@ -462,16 +490,16 @@ namespace InsomniaSystemTypes {
 		public bool CheckIntMemory (string key, int value, string code) {
 			if (!this.Contains(key)) return false;
 			int memoryValue = GetIntMemoryValue(key);
-			if (code == "leq") {
-				return (value <= memoryValue);
-			} else if (code == "geq") {
-				return (value >= memoryValue);
-			} else if (code == "eq") {
-				return (value == memoryValue);
-			} else if (code == "lt") {
-				return (value < memoryValue);
-			} else if (code == "gt") {
-				return (value > memoryValue);
+			if (code == "<=") {
+				return (memoryValue <= value);
+			} else if (code == ">=") {
+				return (memoryValue >= value);
+			} else if (code == "=") {
+				return (memoryValue == value);
+			} else if (code == "<") {
+				return (memoryValue < value);
+			} else if (code == ">") {
+				return (memoryValue > value);
 			}
 			return false;
 		}

@@ -47,7 +47,9 @@ public class DialogueSystem : MonoBehaviour
 		List<Node> nodes = new List<Node>();
 		for (int i = 0; i < lines.Length; ++i) {
 			if (lines[i].Length == 0) continue;
-			nodes.Add(JsonUtility.FromJson<Node>(lines[i]));
+			Node adding = JsonUtility.FromJson<Node>(lines[i]);
+			adding.destinations = GetDestinations(lines[i]);
+			nodes.Add(adding);
 		}
 		nodes.Sort(Utilities.SortNode);
 		return nodes;
@@ -62,6 +64,44 @@ public class DialogueSystem : MonoBehaviour
 		}
 		nodes.Sort(Utilities.SortNode);
 		return nodes;
+	}
+
+	// Destination list creation, to make sure that MemoryDestinations are created.
+	List<Destination> GetDestinations (string node) {
+		List<Destination> dests = new List<Destination>();
+		int start = node.IndexOf("],\"destinations\":[") + 2;
+		int end = node.IndexOf("],\"memories\":[") + 1;
+		string[] destinations = node.Substring(start, end - start).Split('{');
+		string destString;
+		Regex numCheck = new Regex(System.String.Format(@"{0}value{0}:(-?[0-9]+)", "\""));
+		Regex stringCheck = new Regex(System.String.Format(@"{0}value{0}:{0}(.+?){0}", "\""));
+		Regex boolCheck = new Regex(System.String.Format(@"{0}value{0}:(true|false)", "\""));
+		for (int i = 1; i < destinations.Length; ++i) {
+			destString = "{" + destinations[i].Substring(0, destinations[i].Length - 1);
+			if (!destString.Contains("memoryKey")) {
+				dests.Add(JsonUtility.FromJson<Destination>(destString));
+				continue;
+			}
+			// If it is a memory destination, use regex to check each type:
+			MatchCollection mc = numCheck.Matches(destString);
+			if (mc.Count > 0) {
+				dests.Add(JsonUtility.FromJson<MemoryDestinationInt>(destString));
+			} else {
+				mc = stringCheck.Matches(destString);
+				if (mc.Count > 0) {
+					dests.Add(JsonUtility.FromJson<MemoryDestinationString>(destString));
+				} else {
+					mc = boolCheck.Matches(destString);
+					if (mc.Count > 0) {
+						dests.Add(JsonUtility.FromJson<MemoryDestinationBool>(destString));
+					} else {
+						// If it somehow gets to this point, add it as a generic MemoryDestination.
+						dests.Add(JsonUtility.FromJson<MemoryDestination>(destString));
+					}
+				}
+			}
+		}
+		return dests;
 	}
 
 	// Called by dialogue buttons when a choice is made.
@@ -102,9 +142,14 @@ public class DialogueSystem : MonoBehaviour
 				dests = new List<Destination>();
 				memdests = new List<MemoryDestination>();
 				for (int j = 0; j < node.destinations.Count; ++j) {
-					if (memdests.GetType() == Utilities.memoryDestination.GetType()) {
-						// If a memory destination is found, add it to the list of memory destinations.
-						memdests.Add((MemoryDestination)node.destinations[j]);
+					// If a memory destination is found, add it to the list of memory destinations.
+					System.Type destType = node.destinations[j].GetType();
+					if (destType == Utilities.memoryDestinationInt.GetType()) {
+						memdests.Add((MemoryDestinationInt)node.destinations[j]);
+					} else if (destType == Utilities.memoryDestinationString.GetType()) {
+						memdests.Add((MemoryDestinationString)node.destinations[j]);
+					} else if (destType == Utilities.memoryDestinationBool.GetType()) {
+						memdests.Add((MemoryDestinationBool)node.destinations[j]);
 					} else {
 						// If it's a normal destination, just add it to the list of destinations.
 						dests.Add(node.destinations[j]);
@@ -115,7 +160,7 @@ public class DialogueSystem : MonoBehaviour
 				// set i to point to that memory.
 				if (memdests.Count > 0) {
 					for (int j = 0; j < memdests.Count; ++j) {
-						if (memories.memories.CheckMemory(memdests[i])) {
+						if (memories.memories.CheckMemory(memdests[j])) {
 							if (memdests[j].forced) {
 								usingMemDest = true;
 								i = memdests[j].dest;

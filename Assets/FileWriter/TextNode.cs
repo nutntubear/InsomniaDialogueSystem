@@ -30,6 +30,7 @@ public class TextNode : MonoBehaviour
 		shadow.SetActive(false);
 		transform.position = new Vector3(transform.position.x, transform.position.y, 0);
 		bounds = GetComponent<SpriteRenderer>().bounds;
+		node.position = (Vector2)transform.position;
 	}
 
 	public void SetText () {
