@@ -26,37 +26,47 @@ public class DestinationObject : MonoBehaviour
 		SwitchByInt(drop.value);
 	}
 
+	// Used to update the currentDest variable if it is a MemoryDestination.
 	public void UpdateMemory () {
-		if (currentDest.GetType() == Utilities.destination.GetType()) return;
+		string destType = Utilities.GetDestinationType(currentDest);
+		if (destType == "base") return;
 		((MemoryDestination)currentDest).memoryKey = memoryName.text;
 		((MemoryDestination)currentDest).checkCode = allChecks[check.value].text;
 		((MemoryDestination)currentDest).forced = forceDestination.isOn;
-		if (currentDest.GetType() == Utilities.memoryDestinationInt.GetType()) {
+
+		if (destType == "int") {
 			int attempt = 0;
 			Int32.TryParse(memoryValue.text, out attempt);
 			((MemoryDestinationInt)currentDest).value = attempt;
-		} else if (currentDest.GetType() == Utilities.memoryDestinationString.GetType()) {
+		} else if (destType == "string") {
 			((MemoryDestinationString)currentDest).value = memoryValue.text;
-		} else if (currentDest.GetType() == Utilities.memoryDestinationBool.GetType()) {
+		} else if (destType == "bool") {
 			((MemoryDestinationBool)currentDest).value = (memoryValueBoolean.value == 0);
 		}
 	}
 
+	// Switch the UI based on the type of destination given:
+	// 		0 = Base
+	//		1 = Int
+	//		2 = String
+	//		3 = Bool
 	void SwitchByInt (int val) {
 		memoryValue.gameObject.SetActive(true);
 		memoryValueBoolean.gameObject.SetActive(false);
 		if (val == 0) {
-			currentDest = (Destination)currentDest;
+			currentDest = new Destination(currentDest.dest);
 			memoryName.text = "";
 			memoryName.interactable = false;
 			memoryValue.interactable = false;
 			check.interactable = false;
 			forceDestination.interactable = false;
 		} else {
+			// UI Settings for all memory destinations:
 			memoryName.interactable = true;
 			memoryValue.interactable = true;
 			check.interactable = true;
 			forceDestination.interactable = true;
+			// UI Settings for specific types of memory destinations:
 			if (val == 1) {
 				currentDest = new MemoryDestinationInt(currentDest);
 				check.options = allChecks;
@@ -74,6 +84,7 @@ public class DestinationObject : MonoBehaviour
 		}
 	}
 
+	// Setup the UI and currentDest destination; to be used when a DestinationObject is created.
 	public void Setup (Destination dest) {
 		currentDest = dest;
 		Type destinationType = dest.GetType();
@@ -103,6 +114,7 @@ public class DestinationObject : MonoBehaviour
 	}
 
 	void Start () {
+		// If this is the first DestinationObject, set up the check lists.
 		if (allChecks.Count == 0) {
 			allChecks.Add(new Dropdown.OptionData("="));
 			allChecks.Add(new Dropdown.OptionData(">"));

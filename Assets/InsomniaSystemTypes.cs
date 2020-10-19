@@ -11,7 +11,7 @@ namespace InsomniaSystemTypes {
 	Utilities
 	*/
 	public class Utilities {
-		// Base type (save memory for comparisons)
+		// Base types (save memory for comparisons)
 		public static Destination destination = new Destination();
 		public static MemoryDestination memoryDestination = new MemoryDestination();
 		public static MemoryDestinationInt memoryDestinationInt = new MemoryDestinationInt();
@@ -23,6 +23,19 @@ namespace InsomniaSystemTypes {
 
 		public static int SortNode (Node a, Node b) {
 			return a.id.CompareTo(b.id);
+		}
+
+		// Used to give the type of a destination without needing to run these checks every time.
+		public static string GetDestinationType (Destination dest) {
+			if (dest.GetType() == memoryDestinationInt.GetType()) {
+				return "int";
+			} else if (dest.GetType() == memoryDestinationString.GetType()) {
+				return "string";
+			} else if (dest.GetType() == memoryDestinationBool.GetType()) {
+				return "bool";
+			} else {
+				return "base";
+			}
 		}
 
 	}
@@ -78,15 +91,15 @@ namespace InsomniaSystemTypes {
 		// Returns a JSON formatted string containing the Node information.
 		public string SaveNode () {
 			SetType();
-			Type checkType;
+			string checkType;
 			string destinationsString = "";
 			for (int i = 0; i < destinations.Count; ++i) {
-				checkType = destinations[i].GetType();
-				if (checkType == Utilities.memoryDestinationInt.GetType()) {
+				checkType = Utilities.GetDestinationType(destinations[i]);
+				if (checkType == "int") {
 					destinationsString += JsonUtility.ToJson((MemoryDestinationInt)destinations[i]);
-				} else if (checkType == Utilities.memoryDestinationString.GetType()) {
+				} else if (checkType == "bool") {
 					destinationsString += JsonUtility.ToJson((MemoryDestinationString)destinations[i]);
-				} else if (checkType == Utilities.memoryDestinationBool.GetType()) {
+				} else if (checkType == "string") {
 					destinationsString += JsonUtility.ToJson((MemoryDestinationBool)destinations[i]);
 				} else {
 					destinationsString += JsonUtility.ToJson(destinations[i]);

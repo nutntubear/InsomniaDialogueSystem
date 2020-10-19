@@ -39,6 +39,9 @@ public class DialogueSystem : MonoBehaviour
 	Node node;
 	List<Destination> dests = new List<Destination>();
 	List<MemoryDestination> memdests = new List<MemoryDestination>();
+	Regex numCheck = new Regex(System.String.Format(@"{0}value{0}:(-?[0-9]+)", "\""));
+	Regex stringCheck = new Regex(System.String.Format(@"{0}value{0}:{0}(.+?){0}", "\""));
+	Regex boolCheck = new Regex(System.String.Format(@"{0}value{0}:(true|false)", "\""));
 
 	// Node Array creator, reading from a TextAsset.
 	List<Node> ReadFromFile (TextAsset file) {
@@ -69,13 +72,11 @@ public class DialogueSystem : MonoBehaviour
 	// Destination list creation, to make sure that MemoryDestinations are created.
 	List<Destination> GetDestinations (string node) {
 		List<Destination> dests = new List<Destination>();
+		// Find the section of the node JSON string where destinations are found.
 		int start = node.IndexOf("],\"destinations\":[") + 2;
 		int end = node.IndexOf("],\"memories\":[") + 1;
 		string[] destinations = node.Substring(start, end - start).Split('{');
 		string destString;
-		Regex numCheck = new Regex(System.String.Format(@"{0}value{0}:(-?[0-9]+)", "\""));
-		Regex stringCheck = new Regex(System.String.Format(@"{0}value{0}:{0}(.+?){0}", "\""));
-		Regex boolCheck = new Regex(System.String.Format(@"{0}value{0}:(true|false)", "\""));
 		for (int i = 1; i < destinations.Length; ++i) {
 			destString = "{" + destinations[i].Substring(0, destinations[i].Length - 1);
 			if (!destString.Contains("memoryKey")) {
@@ -141,14 +142,15 @@ public class DialogueSystem : MonoBehaviour
 				// Branching node: Populate lists of memory based choices and standard choices.
 				dests = new List<Destination>();
 				memdests = new List<MemoryDestination>();
+				string destType;
 				for (int j = 0; j < node.destinations.Count; ++j) {
 					// If a memory destination is found, add it to the list of memory destinations.
-					System.Type destType = node.destinations[j].GetType();
-					if (destType == Utilities.memoryDestinationInt.GetType()) {
+					destType = Utilities.GetDestinationType(node.destinations[j]);
+					if (destType == "int") {
 						memdests.Add((MemoryDestinationInt)node.destinations[j]);
-					} else if (destType == Utilities.memoryDestinationString.GetType()) {
+					} else if (destType == "string") {
 						memdests.Add((MemoryDestinationString)node.destinations[j]);
-					} else if (destType == Utilities.memoryDestinationBool.GetType()) {
+					} else if (destType == "bool") {
 						memdests.Add((MemoryDestinationBool)node.destinations[j]);
 					} else {
 						// If it's a normal destination, just add it to the list of destinations.
