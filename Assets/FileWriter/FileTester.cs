@@ -39,6 +39,9 @@ public class FileTester : MonoBehaviour
 	Node node;
 	List<Destination> dests = new List<Destination>();
 	List<MemoryDestination> memdests = new List<MemoryDestination>();
+	Regex numCheck = new Regex(System.String.Format(@"{0}value{0}:(-?[0-9]+)", "\""));
+	Regex stringCheck = new Regex(System.String.Format(@"{0}value{0}:{0}(.+?){0}", "\""));
+	Regex boolCheck = new Regex(System.String.Format(@"{0}value{0}:(true|false)", "\""));
 
 	// Node Array creator, reading from a TextAsset.
 	List<Node> ReadFromFile (TextAsset file) {
@@ -47,7 +50,9 @@ public class FileTester : MonoBehaviour
 		List<Node> nodes = new List<Node>();
 		for (int i = 0; i < lines.Length; ++i) {
 			if (lines[i].Length == 0) continue;
-			nodes.Add(JsonUtility.FromJson<Node>(lines[i]));
+			Node adding = JsonUtility.FromJson<Node>(lines[i]);
+			adding.destinations = GetDestinations(lines[i]);
+			nodes.Add(adding);
 		}
 		nodes.Sort(Utilities.SortNode);
 		return nodes;
@@ -62,6 +67,42 @@ public class FileTester : MonoBehaviour
 		}
 		nodes.Sort(Utilities.SortNode);
 		return nodes;
+	}
+
+	// Destination list creation, to make sure that MemoryDestinations are created.
+	List<Destination> GetDestinations (string node) {
+		List<Destination> dests = new List<Destination>();
+		// Find the section of the node JSON string where destinations are found.
+		int start = node.IndexOf("],\"destinations\":[") + 2;
+		int end = node.IndexOf("],\"memories\":[") + 1;
+		string[] destinations = node.Substring(start, end - start).Split('{');
+		string destString;
+		for (int i = 1; i < destinations.Length; ++i) {
+			destString = "{" + destinations[i].Substring(0, destinations[i].Length - 1);
+			if (!destString.Contains("memoryKey")) {
+				dests.Add(JsonUtility.FromJson<Destination>(destString));
+				continue;
+			}
+			// If it is a memory destination, use regex to check each type:
+			MatchCollection mc = numCheck.Matches(destString);
+			if (mc.Count > 0) {
+				dests.Add(JsonUtility.FromJson<MemoryDestinationInt>(destString));
+			} else {
+				mc = stringCheck.Matches(destString);
+				if (mc.Count > 0) {
+					dests.Add(JsonUtility.FromJson<MemoryDestinationString>(destString));
+				} else {
+					mc = boolCheck.Matches(destString);
+					if (mc.Count > 0) {
+						dests.Add(JsonUtility.FromJson<MemoryDestinationBool>(destString));
+					} else {
+						// If it somehow gets to this point, add it as a generic MemoryDestination.
+						dests.Add(JsonUtility.FromJson<MemoryDestination>(destString));
+					}
+				}
+			}
+		}
+		return dests;
 	}
 
 	// Called by dialogue buttons when a choice is made.
@@ -101,10 +142,16 @@ public class FileTester : MonoBehaviour
 				// Branching node: Populate lists of memory based choices and standard choices.
 				dests = new List<Destination>();
 				memdests = new List<MemoryDestination>();
+				string destType;
 				for (int j = 0; j < node.destinations.Count; ++j) {
-					if (memdests.GetType() == Utilities.memoryDestination.GetType()) {
-						// If a memory destination is found, add it to the list of memory destinations.
-						memdests.Add((MemoryDestination)node.destinations[j]);
+					// If a memory destination is found, add it to the list of memory destinations.
+					destType = Utilities.GetDestinationType(node.destinations[j]);
+					if (destType == "int") {
+						memdests.Add((MemoryDestinationInt)node.destinations[j]);
+					} else if (destType == "string") {
+						memdests.Add((MemoryDestinationString)node.destinations[j]);
+					} else if (destType == "bool") {
+						memdests.Add((MemoryDestinationBool)node.destinations[j]);
 					} else {
 						// If it's a normal destination, just add it to the list of destinations.
 						dests.Add(node.destinations[j]);
@@ -115,7 +162,7 @@ public class FileTester : MonoBehaviour
 				// set i to point to that memory.
 				if (memdests.Count > 0) {
 					for (int j = 0; j < memdests.Count; ++j) {
-						if (memories.memories.CheckMemory(memdests[i])) {
+						if (memories.memories.CheckMemory(memdests[j])) {
 							if (memdests[j].forced) {
 								usingMemDest = true;
 								i = memdests[j].dest;
@@ -167,21 +214,10 @@ public class FileTester : MonoBehaviour
 	}
 
 	// Methods for displaying dialogue, to be overridden in readers.
-	public void SetTextBox (string body, string speaker, bool isPlayer=false) {
-
-	}
-
-	public void SetChoices (List<Destination> dests, string speaker) {
-
-	}
-
-	public void ResetChoices () {
-
-	}
-	
-	public void End () {
-
-	}
+	public virtual void SetTextBox (string body, string speaker, bool isPlayer=false) {}
+	public virtual void SetChoices (List<Destination> dests, string speaker) {}
+	public virtual void ResetChoices () {}
+	public virtual void End () {}
 
 	public virtual void StartReading (int fileIndex) {
 		StartCoroutine(ReadFile(ReadFromFile(dialogues[fileIndex])));
