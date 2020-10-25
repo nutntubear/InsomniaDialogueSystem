@@ -17,6 +17,10 @@ namespace InsomniaSystemTypes {
 		public static MemoryDestinationInt memoryDestinationInt = new MemoryDestinationInt();
 		public static MemoryDestinationString memoryDestinationString = new MemoryDestinationString();
 		public static MemoryDestinationBool memoryDestinationBool = new MemoryDestinationBool();
+		public static DialogueEvent dialogueEvent = new DialogueEvent();
+		public static DialogueIntEvent dialogueIntEvent = new DialogueIntEvent();
+		public static DialogueStringEvent dialogueStringEvent = new DialogueStringEvent();
+		public static DialogueBoolEvent dialogueBoolEvent = new DialogueBoolEvent();
 		public static IntMemory intMemory = new IntMemory();
 		public static StringMemory stringMemory = new StringMemory();
 		public static BoolMemory boolMemory = new BoolMemory();
@@ -32,6 +36,19 @@ namespace InsomniaSystemTypes {
 			} else if (dest.GetType() == memoryDestinationString.GetType()) {
 				return "string";
 			} else if (dest.GetType() == memoryDestinationBool.GetType()) {
+				return "bool";
+			} else {
+				return "base";
+			}
+		}
+
+		// Used to give the type of an event without needing to run these checks every time.
+		public static string GetEventType (DialogueEvent ev) {
+			if (ev.GetType() == dialogueIntEvent.GetType()) {
+				return "int";
+			} else if (ev.GetType() == dialogueStringEvent.GetType()) {
+				return "string";
+			} else if (ev.GetType() == dialogueBoolEvent.GetType()) {
 				return "bool";
 			} else {
 				return "base";
@@ -210,6 +227,10 @@ namespace InsomniaSystemTypes {
 		public DialogueEvent (string key_="") {
 			key = key_;
 		}
+
+		public DialogueEvent (DialogueEvent c) {
+			key = c.key;
+		}
 	}
 	[System.Serializable]
 	public class DialogueIntEvent : DialogueEvent {
@@ -218,6 +239,13 @@ namespace InsomniaSystemTypes {
 		public DialogueIntEvent (string key_="", int param=0) {
 			key = key_;
 			parameter = param;
+		}
+
+		public DialogueIntEvent (DialogueEvent c) {
+			key = c.key;
+			if (Utilities.GetEventType(c) == "int") {
+				parameter = ((DialogueIntEvent)c).parameter;
+			}
 		}
 	}
 	[System.Serializable]
@@ -228,6 +256,13 @@ namespace InsomniaSystemTypes {
 			key = key_;
 			parameter = param;
 		}
+
+		public DialogueStringEvent (DialogueEvent c) {
+			key = c.key;
+			if (Utilities.GetEventType(c) == "string") {
+				parameter = ((DialogueStringEvent)c).parameter;
+			}
+		}
 	}
 	[System.Serializable]
 	public class DialogueBoolEvent : DialogueEvent {
@@ -236,6 +271,13 @@ namespace InsomniaSystemTypes {
 		public DialogueBoolEvent (string key_="", bool param=false) {
 			key = key_;
 			parameter = param;
+		}
+
+		public DialogueBoolEvent (DialogueEvent c) {
+			key = c.key;
+			if (Utilities.GetEventType(c) == "bool") {
+				parameter = ((DialogueBoolEvent)c).parameter;
+			}
 		}
 	}
 
