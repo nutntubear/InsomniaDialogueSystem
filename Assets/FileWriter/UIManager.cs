@@ -37,6 +37,9 @@ public class UIManager : MonoBehaviour
 	public List<GameObject> sections;
 	public List<Image> sectionButtons;
 	public RectTransform destinationList;
+	public RectTransform memoryList;
+	public RectTransform eventList;
+	public Text destinationGuide;
 
 	[Header("Other Settings")]
 	public Color enabledButton;
@@ -102,8 +105,10 @@ public class UIManager : MonoBehaviour
 		if (mode == "addDest") {
 			mode = "";
 			SetAvailableButtons();
+			destinationGuide.text = "";
 		} else {
 			mode = "addDest";
+			destinationGuide.text = "Click a node to add.";
 		}
 	}
 
@@ -119,7 +124,14 @@ public class UIManager : MonoBehaviour
 	}
 
 	public void DeleteDestination () {
-
+		if (mode == "deleteDest") {
+			mode = "";
+			SetAvailableButtons();
+			destinationGuide.text = "";
+		} else {
+			mode = "deleteDest";
+			destinationGuide.text = "Click a node to remove.";
+		}
 	}
 
 	public void AddMemory () {
@@ -224,6 +236,18 @@ public class UIManager : MonoBehaviour
 					mode = "";
 					SetAvailableButtons();
 					AddDestinationObject(new Destination(dest), nodes.destinations.Count);
+					destinationGuide.text = "";
+				}
+			} else if (mode == "deleteDest") {
+				int dest = nodes.DeleteDestination(mousePos);
+				if (dest != -1) {
+					mode = "";
+					Destroy(destinationList.transform.GetChild(dest).gameObject);
+					for (int i = dest; i < destinationList.transform.childCount; ++i) {
+						destinationList.transform.GetChild(i).GetComponent<RectTransform>().anchoredPosition +=
+							new Vector2(0, 120);
+						destinationGuide.text = "";
+					}
 				}
 			} else if (mode == "") {
 				nodes.UpdateDestinations(showing);
