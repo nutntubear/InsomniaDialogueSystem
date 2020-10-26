@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using InsomniaSystemTypes;
+using UnityEngine.UI;
 
 public class FileTester : MonoBehaviour
 {
@@ -122,10 +123,23 @@ public class FileTester : MonoBehaviour
 		foreach (Match m in mc) {
 			if (memories.memories.Contains(m.Value.Trim('%'), out tempReplace)) {
 				line = line.Replace(m.Value, tempReplace);
+                PrintInTextBox(m.Value + " was replaced with " + tempReplace);
 			}
 		}
 		return line;
 	}
+
+
+    IEnumerator PrintInTextBox(string s)
+    {
+        GameObject text = (GameObject)Instantiate(new GameObject());
+        text.transform.SetParent(GameObject.Find("Canvas").transform);
+        text.transform.position = new Vector3(0, 10, 0);
+        text.AddComponent<Text>();
+        text.GetComponent<Text>().text = s;
+        yield return new WaitForSeconds(3);
+        Destroy(text);
+    }
 
 	// An IEnumerator to read through a dialogue file.
 	IEnumerator ReadFile (List<Node> nodes) {
@@ -192,16 +206,22 @@ public class FileTester : MonoBehaviour
 
 			// Manage memories.
 			if (node.memories.Count > 0) {
+                string s = "";
 				for (int j = 0; j < node.memories.Count; ++j) {
 					memories.memories.SetMemory(node.memories[j]);
+                    s += "Set a new memory '" + node.memories[j].ToString() + "'\n";
 				}
+                PrintInTextBox(s);
 			}
 
 			// Manage events.
 			if (node.events.Count > 0) {
+                string s = "";
 				for (int j = 0; j < node.events.Count; ++j) {
 					events.TriggerEvent(node.events[j]);
+                    s += "Triggered event '" + node.events[j].ToString() + "'\n";
 				}
+                PrintInTextBox(s);
 			}
 			
 			// Wait until the player continues.
