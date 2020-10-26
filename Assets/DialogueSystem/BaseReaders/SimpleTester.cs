@@ -15,7 +15,7 @@ public class SimpleTester : DialogueSystem
 
 	// Setting the main text box.
 	public override void SetTextBox (string body, string speaker, bool isPlayer=false) {
-		bodyBox.text = body;
+		bodyBox.text = ReplaceByMemory(body);
 		speakerBox.text = speaker;
 	}
 

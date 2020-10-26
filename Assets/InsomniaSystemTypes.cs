@@ -485,19 +485,19 @@ namespace InsomniaSystemTypes {
 		public bool Contains (string key, out string val) {
 			for (int i = 0; i < intMemories.Count; ++i) {
 				if (intMemories[i].key == key) {
-					val = key.ToString();
+					val = intMemories[i].value.ToString();
 					return true;
 				}
 			}
 			for (int i = 0; i < stringMemories.Count; ++i) {
 				if (stringMemories[i].key == key){
-					val = key;
+					val = stringMemories[i].value;
 					return true;
 				}
 			}
 			for (int i = 0; i < boolMemories.Count; ++i) {
 				if (boolMemories[i].key == key) {
-					val = key.ToString();
+					val = boolMemories[i].value.ToString();
 					return true;
 				}
 			}
