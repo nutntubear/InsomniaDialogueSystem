@@ -9,6 +9,8 @@ public class NodeManager : MonoBehaviour
 	public List<TextNode> nodes = new List<TextNode>();
 	[HideInInspector]
 	public List<DestinationObject> destinations = new List<DestinationObject>();
+	[HideInInspector]
+	public List<EventObject> events = new List<EventObject>();
 	public GameObject nodePrefab;
 
 	// Temp and hidden

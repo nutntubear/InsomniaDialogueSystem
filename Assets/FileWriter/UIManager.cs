@@ -143,7 +143,19 @@ public class UIManager : MonoBehaviour
 	}
 
 	public void AddEvent () {
+		mode = "";
+		AddEventObject(new DialogueEvent(), nodes.events.Count);
+	}
 
+	void AddEventObject (DialogueEvent ev, int eventIndex) {
+		if ((eventIndex + 1) * 120 >= eventList.sizeDelta.y) {
+			eventList.sizeDelta = new Vector2(0, (eventIndex + 1) * 120);
+			eventList.anchoredPosition = new Vector2(0, -eventList.sizeDelta.y / 2);
+		}
+		Transform newEvent = Instantiate(eventTemplate, eventList).transform;
+		newEvent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -60 - 120 * eventIndex);
+		newEvent.GetComponent<EventObject>().Setup(ev);
+		nodes.events.Add(newEvent.GetComponent<EventObject>());
 	}
 
 	public void DeleteEvent () {
@@ -193,6 +205,10 @@ public class UIManager : MonoBehaviour
 		}
 	}
 
+	public void SetupFields () {
+		fields = Resources.FindObjectsOfTypeAll<InputField>();
+	}
+
 	bool IsTyping () {
 		for (int i = 0; i < fields.Length; ++i) {
 			if (fields[i].isFocused) return true;
@@ -202,7 +218,7 @@ public class UIManager : MonoBehaviour
 
 	void Start () {
 		SwitchTab(0);
-		fields = Resources.FindObjectsOfTypeAll<InputField>();
+		SetupFields();
 	}
 
 	void Update () {

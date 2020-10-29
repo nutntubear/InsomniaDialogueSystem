@@ -19,6 +19,21 @@ public class EventObject : MonoBehaviour
 		SwitchByInt(drop.value);
 	}
 
+	public void UpdateEvent () {
+		currentEvent.key = eventName.text;
+		string evType = Utilities.GetEventType(currentEvent);
+		if (evType == "base") return;
+		if (evType == "int") {
+			int attempt = 0;
+			System.Int32.TryParse(eventParameter.text, out attempt);
+			((DialogueIntEvent)currentEvent).parameter = attempt;
+		} else if (evType == "string") {
+			((DialogueStringEvent)currentEvent).parameter = eventParameter.text;
+		} else if (evType == "bool") {
+			((DialogueBoolEvent)currentEvent).parameter = (eventParameterBoolean.value == 0);
+		}
+	}
+
 	// Switch the UI based on the type of destination given:
 	// 		0 = Base
 	//		1 = Int
@@ -44,6 +59,28 @@ public class EventObject : MonoBehaviour
 				currentEvent = new DialogueBoolEvent(currentEvent);
 				eventParameter.gameObject.SetActive(false);
 				eventParameterBoolean.gameObject.SetActive(true);
+			}
+		}
+	}
+
+	public void Setup (DialogueEvent ev) {
+		currentEvent = ev;
+		string evType = Utilities.GetEventType(currentEvent);
+		eventName.text = ev.key;
+		if (evType == "int") {
+			eventType.value = 0;
+			eventParameter.text = ((DialogueIntEvent)ev).parameter.ToString();
+		} else if (evType == "string") {
+			eventType.value = 1;
+			eventParameter.text = ((DialogueStringEvent)ev).parameter;
+		} else if (evType == "bool") {
+			eventType.value = 2;
+			eventParameter.gameObject.SetActive(false);
+			eventParameterBoolean.gameObject.SetActive(true);
+			if (((DialogueBoolEvent)ev).parameter) {
+				eventParameterBoolean.value = 0;
+			} else {
+				eventParameterBoolean.value = 1;
 			}
 		}
 	}
