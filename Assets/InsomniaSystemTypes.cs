@@ -338,7 +338,13 @@ namespace InsomniaSystemTypes {
 		public DialogueEvent (DialogueEvent c) {
 			key = c.key;
 		}
-	}
+
+        public override string ToString()
+        {
+            return key;
+        }
+
+    }
 	[System.Serializable]
 	public class DialogueIntEvent : DialogueEvent {
 		public int parameter;
@@ -354,7 +360,8 @@ namespace InsomniaSystemTypes {
 				parameter = ((DialogueIntEvent)c).parameter;
 			}
 		}
-	}
+
+    }
 	[System.Serializable]
 	public class DialogueStringEvent : DialogueEvent {
 		public string parameter;
@@ -404,7 +411,7 @@ namespace InsomniaSystemTypes {
 			dest = dest_;
 		}
 
-	}
+    }
 	[System.Serializable]
 	public class MemoryDestination : Destination {
 		[SerializeField]

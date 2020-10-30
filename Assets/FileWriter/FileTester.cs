@@ -15,10 +15,17 @@ public class FileTester : MonoBehaviour
 
 	[Header("Text")]
 	public TextAsset[] dialogues;
+    public GameObject DebugText;
 
 	[Header("UI")]
-	// For enabling/disabling the system at large.
-	public GameObject fullSystem;
+    public Text bodyBox;
+    public Text speakerBox;
+    // List of choices.
+    public List<Text> choiceTexts;
+
+
+    // For enabling/disabling the system at large.
+    public GameObject fullSystem;
 
 	[Header("Preferences")]
 	[Tooltip("A character used for replacing sections of dialogue with memories.")]
@@ -123,22 +130,20 @@ public class FileTester : MonoBehaviour
 		foreach (Match m in mc) {
 			if (memories.memories.Contains(m.Value.Trim('%'), out tempReplace)) {
 				line = line.Replace(m.Value, tempReplace);
-                PrintInTextBox(m.Value + " was replaced with " + tempReplace);
+               PrintInTextBox(m.Value + " was replaced with " + tempReplace);
 			}
 		}
 		return line;
 	}
 
 
-    IEnumerator PrintInTextBox(string s)
+    public void PrintInTextBox(string s)
     {
-        GameObject text = (GameObject)Instantiate(new GameObject());
-        text.transform.SetParent(GameObject.Find("Canvas").transform);
-        text.transform.position = new Vector3(0, 10, 0);
-        text.AddComponent<Text>();
+        print(s);
+        GameObject text = Instantiate(DebugText, GameObject.Find("Canvas").transform);
+        text.GetComponent<RectTransform>().localPosition = Vector3.zero;
         text.GetComponent<Text>().text = s;
-        yield return new WaitForSeconds(3);
-        Destroy(text);
+        Destroy(text, 3);
     }
 
 	// An IEnumerator to read through a dialogue file.
@@ -221,7 +226,7 @@ public class FileTester : MonoBehaviour
 					events.TriggerEvent(node.events[j]);
                     s += "Triggered event '" + node.events[j].ToString() + "'\n";
 				}
-                PrintInTextBox(s);
+               PrintInTextBox(s);
 			}
 			
 			// Wait until the player continues.
@@ -233,14 +238,64 @@ public class FileTester : MonoBehaviour
 		End();
 	}
 
-	// Methods for displaying dialogue, to be overridden in readers.
-	public virtual void SetTextBox (string body, string speaker, bool isPlayer=false) {}
-	public virtual void SetChoices (List<Destination> dests, string speaker) {}
-	public virtual void ResetChoices () {}
-	public virtual void End () {}
+    // Methods for displaying dialogue, to be overridden in readers.
+    public void SetTextBox(string body, string speaker, bool isPlayer = false)
+    {
+        bodyBox.text = ReplaceByMemory(body);
+        speakerBox.text = speaker;
+    }
+
+    // Sets each of the choices that need to be set up with their text and making them interactable.
+    public void SetChoices(List<Destination> dests, string speaker)
+    {
+        for (i = 0; i < choiceTexts.Count; ++i)
+        {
+            if (i >= dests.Count)
+            {
+                choiceTexts[i].text = "";
+                choiceTexts[i].transform.parent.GetComponent<Button>().interactable = false;
+                continue;
+            }
+            choiceTexts[i].text = ReplaceByMemory(currentNodes[dests[i].dest].body);
+            choiceTexts[i].transform.parent.GetComponent<Button>().interactable = true;
+        }
+    }
+
+    // Turning all choices off.
+    public void ResetChoices()
+    {
+        for (i = 0; i < choiceTexts.Count; ++i)
+        {
+            choiceTexts[i].text = "";
+            choiceTexts[i].transform.parent.GetComponent<Button>().interactable = false;
+        }
+    }
+
+    public void End()
+    {
+        ResetChoices();
+        bodyBox.text = "";
+        speakerBox.text = "";
+    }
 
 	public virtual void StartReading (int fileIndex) {
 		StartCoroutine(ReadFile(ReadFromFile(dialogues[fileIndex])));
 	}
+
+    void Update()
+    {
+        // Advances text forward.
+        if (ready && Input.GetMouseButtonUp(0) && !choices)
+        {
+            click = true;
+        }
+    }
+
+    void Start()
+    {
+        StartReading(0);
+    }
+
+
 
 }
