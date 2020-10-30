@@ -80,7 +80,7 @@ public class UIManager : MonoBehaviour
 		if (!Directory.Exists(path)) {
 			Directory.CreateDirectory(path);
 		}
-		File.WriteAllText(path + "test" + ".json", writeToFile);
+		File.WriteAllText(path + "test2" + ".json", writeToFile);
 	}
 
 	public void AddNode () {
@@ -174,7 +174,6 @@ public class UIManager : MonoBehaviour
 			nodeGeneral.SetActive(false);
 			nodeSettings.SetActive(false);
 		} else {
-			int i = 0;
 			nodeGeneral.SetActive(true);
 			nodeSettings.SetActive(true);
 			Node node = nodes.nodes[id].node;
@@ -187,8 +186,17 @@ public class UIManager : MonoBehaviour
 			}
 			nodes.destinations = new List<DestinationObject>();
 			// ...and add the new ones.
-			for (i = 0; i < node.destinations.Count; ++i) {
+			for (int i = 0; i < node.destinations.Count; ++i) {
 				AddDestinationObject(node.destinations[i], i);
+			}
+			// Clear events...
+			foreach (Transform child in eventList.transform) {
+				Destroy(child.gameObject);
+			}
+			nodes.events = new List<EventObject>();
+			// ...and add the new ones.
+			for (int i = 0; i < node.events.Count; ++i) {
+				AddEventObject(node.events[i], i);
 			}
 		}
 	}
@@ -266,7 +274,7 @@ public class UIManager : MonoBehaviour
 					}
 				}
 			} else if (mode == "") {
-				nodes.UpdateDestinations(showing);
+				nodes.UpdateAll(showing);
 				int selected = nodes.SelectNode(mousePos);
 				if (showing != selected) {
 					SwitchNode(selected);

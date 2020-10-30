@@ -111,12 +111,20 @@ public class NodeManager : MonoBehaviour
 		return false;
 	}
 
-	public void UpdateDestinations (int node) {
+	public void UpdateAll (int node) {
+		// Destinations
 		if (node == -1) return;
 		nodes[node].node.destinations = new List<Destination>();
 		for (int i = 0; i < destinations.Count; ++i) {
 			destinations[i].UpdateMemory();
 			nodes[node].node.destinations.Add(destinations[i].currentDest);
+		}
+		// Events
+		if (node == -1) return;
+		nodes[node].node.events = new List<DialogueEvent>();
+		for (int i = 0; i < events.Count; ++i) {
+			events[i].UpdateEvent();
+			nodes[node].node.events.Add(events[i].currentEvent);
 		}
 	}
 

@@ -68,13 +68,13 @@ public class EventObject : MonoBehaviour
 		string evType = Utilities.GetEventType(currentEvent);
 		eventName.text = ev.key;
 		if (evType == "int") {
-			eventType.value = 0;
+			eventType.value = 1;
 			eventParameter.text = ((DialogueIntEvent)ev).parameter.ToString();
 		} else if (evType == "string") {
-			eventType.value = 1;
+			eventType.value = 2;
 			eventParameter.text = ((DialogueStringEvent)ev).parameter;
 		} else if (evType == "bool") {
-			eventType.value = 2;
+			eventType.value = 3;
 			eventParameter.gameObject.SetActive(false);
 			eventParameterBoolean.gameObject.SetActive(true);
 			if (((DialogueBoolEvent)ev).parameter) {
@@ -82,6 +82,8 @@ public class EventObject : MonoBehaviour
 			} else {
 				eventParameterBoolean.value = 1;
 			}
+		} else {
+			SwitchByInt(0);
 		}
 	}
 

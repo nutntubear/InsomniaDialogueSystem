@@ -39,9 +39,6 @@ public class DialogueSystem : MonoBehaviour
 	Node node;
 	List<Destination> dests = new List<Destination>();
 	List<MemoryDestination> memdests = new List<MemoryDestination>();
-	Regex numCheck = new Regex(System.String.Format(@"{0}value{0}:(-?[0-9]+)", "\""));
-	Regex stringCheck = new Regex(System.String.Format(@"{0}value{0}:{0}(.+?){0}", "\""));
-	Regex boolCheck = new Regex(System.String.Format(@"{0}value{0}:(true|false)", "\""));
 
 	// Node Array creator, reading from a TextAsset.
 	List<Node> ReadFromFile (TextAsset file) {
@@ -51,7 +48,8 @@ public class DialogueSystem : MonoBehaviour
 		for (int i = 0; i < lines.Length; ++i) {
 			if (lines[i].Length == 0) continue;
 			Node adding = JsonUtility.FromJson<Node>(lines[i]);
-			adding.destinations = GetDestinations(lines[i]);
+			adding.destinations = Utilities.GetDestinations(lines[i]);
+			adding.events = Utilities.GetEvents(lines[i]);
 			nodes.Add(adding);
 		}
 		nodes.Sort(Utilities.SortNode);
@@ -63,46 +61,13 @@ public class DialogueSystem : MonoBehaviour
 	List<Node> ReadFromArray (string[] lines) {
 		List<Node> nodes = new List<Node>();
 		for (int i = 0; i < lines.Length; ++i) {
-			nodes.Add(JsonUtility.FromJson<Node>(lines[i]));
+			if (lines[i].Length == 0) continue;
+			Node adding = JsonUtility.FromJson<Node>(lines[i]);
+			adding.destinations = Utilities.GetDestinations(lines[i]);
+			nodes.Add(adding);
 		}
 		nodes.Sort(Utilities.SortNode);
 		return nodes;
-	}
-
-	// Destination list creation, to make sure that MemoryDestinations are created.
-	List<Destination> GetDestinations (string node) {
-		List<Destination> dests = new List<Destination>();
-		// Find the section of the node JSON string where destinations are found.
-		int start = node.IndexOf("],\"destinations\":[") + 2;
-		int end = node.IndexOf("],\"memories\":[") + 1;
-		string[] destinations = node.Substring(start, end - start).Split('{');
-		string destString;
-		for (int i = 1; i < destinations.Length; ++i) {
-			destString = "{" + destinations[i].Substring(0, destinations[i].Length - 1);
-			if (!destString.Contains("memoryKey")) {
-				dests.Add(JsonUtility.FromJson<Destination>(destString));
-				continue;
-			}
-			// If it is a memory destination, use regex to check each type:
-			MatchCollection mc = numCheck.Matches(destString);
-			if (mc.Count > 0) {
-				dests.Add(JsonUtility.FromJson<MemoryDestinationInt>(destString));
-			} else {
-				mc = stringCheck.Matches(destString);
-				if (mc.Count > 0) {
-					dests.Add(JsonUtility.FromJson<MemoryDestinationString>(destString));
-				} else {
-					mc = boolCheck.Matches(destString);
-					if (mc.Count > 0) {
-						dests.Add(JsonUtility.FromJson<MemoryDestinationBool>(destString));
-					} else {
-						// If it somehow gets to this point, add it as a generic MemoryDestination.
-						dests.Add(JsonUtility.FromJson<MemoryDestination>(destString));
-					}
-				}
-			}
-		}
-		return dests;
 	}
 
 	// Called by dialogue buttons when a choice is made.

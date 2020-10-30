@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -53,6 +54,84 @@ namespace InsomniaSystemTypes {
 			} else {
 				return "base";
 			}
+		}
+
+		// For the loading of Destinations, DialogueEvents, and Memories when loading Nodes.
+		static Regex numValueCheck = new Regex(System.String.Format(@"{0}value{0}:(-?[0-9]+)", "\""));
+		static Regex stringValueCheck = new Regex(System.String.Format(@"{0}value{0}:{0}(.+?){0}", "\""));
+		static Regex boolValueCheck = new Regex(System.String.Format(@"{0}value{0}:(true|false)", "\""));
+		static Regex numParamCheck = new Regex(System.String.Format(@"{0}parameter{0}:(-?[0-9]+)", "\""));
+		static Regex stringParamCheck = new Regex(System.String.Format(@"{0}parameter{0}:{0}(.+?){0}", "\""));
+		static Regex boolParamCheck = new Regex(System.String.Format(@"{0}parameter{0}:(true|false)", "\""));
+
+		public static List<Destination> GetDestinations (string node) {
+			List<Destination> dests = new List<Destination>();
+			// Find the section of the node JSON string where destinations are found.
+			int start = node.IndexOf("],\"destinations\":[") + 2;
+			int end = node.IndexOf("],\"memories\":[") + 1;
+			string[] destinations = node.Substring(start, end - start).Split('{');
+			string destString;
+			for (int i = 1; i < destinations.Length; ++i) {
+				destString = "{" + destinations[i].Substring(0, destinations[i].Length - 1);
+				if (!destString.Contains("memoryKey")) {
+					dests.Add(JsonUtility.FromJson<Destination>(destString));
+					continue;
+				}
+				// If it is a memory destination, use regex to check each type:
+				MatchCollection mc = numValueCheck.Matches(destString);
+				if (mc.Count > 0) {
+					dests.Add(JsonUtility.FromJson<MemoryDestinationInt>(destString));
+				} else {
+					mc = stringValueCheck.Matches(destString);
+					if (mc.Count > 0) {
+						dests.Add(JsonUtility.FromJson<MemoryDestinationString>(destString));
+					} else {
+						mc = boolValueCheck.Matches(destString);
+						if (mc.Count > 0) {
+							dests.Add(JsonUtility.FromJson<MemoryDestinationBool>(destString));
+						} else {
+							// If it somehow gets to this point, add it as a generic MemoryDestination.
+							dests.Add(JsonUtility.FromJson<MemoryDestination>(destString));
+						}
+					}
+				}
+			}
+			return dests;
+		}
+
+		public static List<DialogueEvent> GetEvents (string node) {
+			List<DialogueEvent> events = new List<DialogueEvent>();
+			// Find the section of the node JSON string where dEvents are found.
+			int start = node.IndexOf(",\"events\":[") + 2;
+			int end = node.IndexOf("],\"destinations\":[") + 1;
+			string[] dEvents = node.Substring(start, end - start).Split('{');
+			string eventString;
+			for (int i = 1; i < dEvents.Length; ++i) {
+				eventString = "{" + dEvents[i].Substring(0, dEvents[i].Length - 1);
+				if (!eventString.Contains("parameter")) {
+					events.Add(JsonUtility.FromJson<DialogueEvent>(eventString));
+					continue;
+				}
+				// If it is a memory destination, use regex to check each type:
+				MatchCollection mc = numParamCheck.Matches(eventString);
+				if (mc.Count > 0) {
+					events.Add(JsonUtility.FromJson<DialogueIntEvent>(eventString));
+				} else {
+					mc = stringParamCheck.Matches(eventString);
+					if (mc.Count > 0) {
+						events.Add(JsonUtility.FromJson<DialogueStringEvent>(eventString));
+					} else {
+						mc = boolParamCheck.Matches(eventString);
+						if (mc.Count > 0) {
+							events.Add(JsonUtility.FromJson<DialogueBoolEvent>(eventString));
+						} else {
+							// If it somehow gets to this point, add it as a generic MemoryDestination.
+							events.Add(JsonUtility.FromJson<DialogueEvent>(eventString));
+						}
+					}
+				}
+			}
+			return events;
 		}
 
 	}
@@ -109,14 +188,17 @@ namespace InsomniaSystemTypes {
 		public string SaveNode () {
 			SetType();
 			string checkType;
+			// Get JSON for Destinations:
 			string destinationsString = "";
+			List<Destination> tempDests = new List<Destination>();
 			for (int i = 0; i < destinations.Count; ++i) {
+				tempDests.Add(destinations[i]);
 				checkType = Utilities.GetDestinationType(destinations[i]);
 				if (checkType == "int") {
 					destinationsString += JsonUtility.ToJson((MemoryDestinationInt)destinations[i]);
-				} else if (checkType == "bool") {
-					destinationsString += JsonUtility.ToJson((MemoryDestinationString)destinations[i]);
 				} else if (checkType == "string") {
+					destinationsString += JsonUtility.ToJson((MemoryDestinationString)destinations[i]);
+				} else if (checkType == "bool") {
 					destinationsString += JsonUtility.ToJson((MemoryDestinationBool)destinations[i]);
 				} else {
 					destinationsString += JsonUtility.ToJson(destinations[i]);
@@ -127,8 +209,33 @@ namespace InsomniaSystemTypes {
 			}
 			destinations = new List<Destination>();
 			destinations.Add(new Destination(-1));
+			// Get JSON for Events:
+			string eventsString = "";
+			List<DialogueEvent> tempEvents = new List<DialogueEvent>();
+			for (int i = 0; i < events.Count; ++i) {
+				tempEvents.Add(events[i]);
+				checkType = Utilities.GetEventType(events[i]);
+				if (checkType == "int") {
+					eventsString += JsonUtility.ToJson((DialogueIntEvent)events[i]);
+				} else if (checkType == "string") {
+					eventsString += JsonUtility.ToJson((DialogueStringEvent)events[i]);
+				} else if (checkType == "bool") {
+					eventsString += JsonUtility.ToJson((DialogueBoolEvent)events[i]);
+				} else {
+					eventsString += JsonUtility.ToJson(events[i]);
+				}
+				if (i != events.Count - 1) {
+					eventsString += ",";
+				}
+			}
+			events = new List<DialogueEvent>();
+			events.Add(new DialogueEvent());
 			string jsonText = JsonUtility.ToJson(this);
 			jsonText = jsonText.Replace("{\"dest\":-1}", destinationsString);
+			jsonText = jsonText.Replace("{\"key\":\"\"}", eventsString);
+			// Reset the replaced lists:
+			destinations = tempDests;
+			events = tempEvents;
 			return jsonText;
 		}
 
