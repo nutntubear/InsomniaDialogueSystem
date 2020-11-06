@@ -15,17 +15,15 @@ public class FileTester : MonoBehaviour
 
 	[Header("Text")]
 	public TextAsset[] dialogues;
-    public GameObject DebugText;
 
 	[Header("UI")]
-    public Text bodyBox;
+	public Text bodyBox;
     public Text speakerBox;
     // List of choices.
     public List<Text> choiceTexts;
-
-
-    // For enabling/disabling the system at large.
-    public GameObject fullSystem;
+    public GameObject DebugText;
+	// For enabling/disabling the system at large.
+	public GameObject fullSystem;
 
 	[Header("Preferences")]
 	[Tooltip("A character used for replacing sections of dialogue with memories.")]
@@ -46,10 +44,8 @@ public class FileTester : MonoBehaviour
 	public List<Node> currentNodes;
 	Node node;
 	List<Destination> dests = new List<Destination>();
-	List<MemoryDestination> memdests = new List<MemoryDestination>();
-	Regex numCheck = new Regex(System.String.Format(@"{0}value{0}:(-?[0-9]+)", "\""));
-	Regex stringCheck = new Regex(System.String.Format(@"{0}value{0}:{0}(.+?){0}", "\""));
-	Regex boolCheck = new Regex(System.String.Format(@"{0}value{0}:(true|false)", "\""));
+	int j = 0;
+	string s;
 
 	// Node Array creator, reading from a TextAsset.
 	List<Node> ReadFromFile (TextAsset file) {
@@ -58,9 +54,7 @@ public class FileTester : MonoBehaviour
 		List<Node> nodes = new List<Node>();
 		for (int i = 0; i < lines.Length; ++i) {
 			if (lines[i].Length == 0) continue;
-			Node adding = JsonUtility.FromJson<Node>(lines[i]);
-			adding.destinations = GetDestinations(lines[i]);
-			nodes.Add(adding);
+			nodes.Add(JsonUtility.FromJson<Node>(lines[i]));
 		}
 		nodes.Sort(Utilities.SortNode);
 		return nodes;
@@ -71,46 +65,11 @@ public class FileTester : MonoBehaviour
 	List<Node> ReadFromArray (string[] lines) {
 		List<Node> nodes = new List<Node>();
 		for (int i = 0; i < lines.Length; ++i) {
+			if (lines[i].Length == 0) continue;
 			nodes.Add(JsonUtility.FromJson<Node>(lines[i]));
 		}
 		nodes.Sort(Utilities.SortNode);
 		return nodes;
-	}
-
-	// Destination list creation, to make sure that MemoryDestinations are created.
-	List<Destination> GetDestinations (string node) {
-		List<Destination> dests = new List<Destination>();
-		// Find the section of the node JSON string where destinations are found.
-		int start = node.IndexOf("],\"destinations\":[") + 2;
-		int end = node.IndexOf("],\"memories\":[") + 1;
-		string[] destinations = node.Substring(start, end - start).Split('{');
-		string destString;
-		for (int i = 1; i < destinations.Length; ++i) {
-			destString = "{" + destinations[i].Substring(0, destinations[i].Length - 1);
-			if (!destString.Contains("memoryKey")) {
-				dests.Add(JsonUtility.FromJson<Destination>(destString));
-				continue;
-			}
-			// If it is a memory destination, use regex to check each type:
-			MatchCollection mc = numCheck.Matches(destString);
-			if (mc.Count > 0) {
-				dests.Add(JsonUtility.FromJson<MemoryDestinationInt>(destString));
-			} else {
-				mc = stringCheck.Matches(destString);
-				if (mc.Count > 0) {
-					dests.Add(JsonUtility.FromJson<MemoryDestinationString>(destString));
-				} else {
-					mc = boolCheck.Matches(destString);
-					if (mc.Count > 0) {
-						dests.Add(JsonUtility.FromJson<MemoryDestinationBool>(destString));
-					} else {
-						// If it somehow gets to this point, add it as a generic MemoryDestination.
-						dests.Add(JsonUtility.FromJson<MemoryDestination>(destString));
-					}
-				}
-			}
-		}
-		return dests;
 	}
 
 	// Called by dialogue buttons when a choice is made.
@@ -130,14 +89,12 @@ public class FileTester : MonoBehaviour
 		foreach (Match m in mc) {
 			if (memories.memories.Contains(m.Value.Trim('%'), out tempReplace)) {
 				line = line.Replace(m.Value, tempReplace);
-               PrintInTextBox(m.Value + " was replaced with " + tempReplace);
 			}
 		}
 		return line;
 	}
 
-
-    public void PrintInTextBox(string s)
+	public void PrintInTextBox(string s)
     {
         print(s);
         GameObject text = Instantiate(DebugText, GameObject.Find("Canvas").transform);
@@ -159,36 +116,40 @@ public class FileTester : MonoBehaviour
 			SetTextBox(node.body, node.speaker, node.player);
 			if (node.type == 'b') {
 				// Branching node: Populate lists of memory based choices and standard choices.
-				dests = new List<Destination>();
-				memdests = new List<MemoryDestination>();
-				string destType;
-				for (int j = 0; j < node.destinations.Count; ++j) {
-					// If a memory destination is found, add it to the list of memory destinations.
-					destType = Utilities.GetDestinationType(node.destinations[j]);
-					if (destType == "int") {
-						memdests.Add((MemoryDestinationInt)node.destinations[j]);
-					} else if (destType == "string") {
-						memdests.Add((MemoryDestinationString)node.destinations[j]);
-					} else if (destType == "bool") {
-						memdests.Add((MemoryDestinationBool)node.destinations[j]);
-					} else {
-						// If it's a normal destination, just add it to the list of destinations.
-						dests.Add(node.destinations[j]);
-					}
-				}
 				// If there are memory destinations, check all of them using the MemoryDictionary's CheckMemory method.
 				// If the MemoryCheck returns true, add it to memDests. If it is true and the memory destination is forced,
 				// set i to point to that memory.
-				if (memdests.Count > 0) {
-					for (int j = 0; j < memdests.Count; ++j) {
-						if (memories.memories.CheckMemory(memdests[j])) {
-							if (memdests[j].forced) {
-								usingMemDest = true;
-								i = memdests[j].dest;
-								break;
-							} else {
-								dests.Add(memdests[j]);
-							}
+				dests = new List<Destination>();
+				for (j = 0; j < node.intDestinations.Count; ++j) {
+					if (memories.memories.CheckMemoryInt(node.intDestinations[j])) {
+						if (node.intDestinations[j].forced) {
+							usingMemDest = true;
+							i = node.intDestinations[j].dest;
+							break;
+						} else {
+							dests.Add(node.intDestinations[j]);
+						}
+					}
+				}
+				for (j = 0; j < node.stringDestinations.Count; ++j) {
+					if (memories.memories.CheckMemoryString(node.stringDestinations[j])) {
+						if (node.stringDestinations[j].forced) {
+							usingMemDest = true;
+							i = node.stringDestinations[j].dest;
+							break;
+						} else {
+							dests.Add(node.stringDestinations[j]);
+						}
+					}
+				}
+				for (j = 0; j < node.boolDestinations.Count; ++j) {
+					if (memories.memories.CheckMemoryBool(node.boolDestinations[j])) {
+						if (node.boolDestinations[j].forced) {
+							usingMemDest = true;
+							i = node.boolDestinations[j].dest;
+							break;
+						} else {
+							dests.Add(node.boolDestinations[j]);
 						}
 					}
 				}
@@ -209,25 +170,41 @@ public class FileTester : MonoBehaviour
 				i = -1;
 			}
 
-			// Manage memories.
-			if (node.memories.Count > 0) {
-                string s = "";
-				for (int j = 0; j < node.memories.Count; ++j) {
-					memories.memories.SetMemory(node.memories[j]);
-                    s += "Set a new memory '" + node.memories[j].ToString() + "'\n";
-				}
-                PrintInTextBox(s);
-			}
-
 			// Manage events.
-			if (node.events.Count > 0) {
-                string s = "";
-				for (int j = 0; j < node.events.Count; ++j) {
-					events.TriggerEvent(node.events[j]);
-                    s += "Triggered event '" + node.events[j].ToString() + "'\n";
-				}
-               PrintInTextBox(s);
+			s = "";
+			for (j = 0; j < node.events.Count; ++j) {
+				events.TriggerEvent(node.events[j]);
+				s += "Triggered event '" + node.events[j].ToString() + "'\n";
 			}
+			for (j = 0; j < node.intEvents.Count; ++j) {
+				events.TriggerEvent(node.intEvents[j]);
+				s += "Triggered event '" + node.intEvents[j].ToString() + "'\n";
+			}
+			for (j = 0; j < node.stringEvents.Count; ++j) {
+				events.TriggerEvent(node.stringEvents[j]);
+				s += "Triggered event '" + node.stringEvents[j].ToString() + "'\n";
+			}
+			for (j = 0; j < node.boolEvents.Count; ++j) {
+				events.TriggerEvent(node.boolEvents[j]);
+				s += "Triggered event '" + node.boolEvents[j].ToString() + "'\n";
+			}
+			PrintInTextBox(s);
+
+			// Manage memories.
+			s = "";
+			for (j = 0; j < node.intMemories.Count; ++j) {
+				memories.memories.SetMemoryInt(node.intMemories[j]);
+				s += "Set a new memory '" + node.intMemories[j].ToString() + "'\n";
+			}
+			for (j = 0; j < node.stringMemories.Count; ++j) {
+				memories.memories.SetMemoryString(node.stringMemories[j]);
+				s += "Set a new memory '" + node.stringMemories[j].ToString() + "'\n";
+			}
+			for (j = 0; j < node.boolMemories.Count; ++j) {
+				memories.memories.SetMemoryBool(node.boolMemories[j]);
+				s += "Set a new memory '" + node.boolMemories[j].ToString() + "'\n";
+			}
+			PrintInTextBox(s);
 			
 			// Wait until the player continues.
 			ready = true;

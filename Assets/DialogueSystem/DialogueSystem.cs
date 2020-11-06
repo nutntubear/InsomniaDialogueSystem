@@ -38,7 +38,7 @@ public class DialogueSystem : MonoBehaviour
 	public List<Node> currentNodes;
 	Node node;
 	List<Destination> dests = new List<Destination>();
-	List<MemoryDestination> memdests = new List<MemoryDestination>();
+	int j = 0;
 
 	// Node Array creator, reading from a TextAsset.
 	List<Node> ReadFromFile (TextAsset file) {
@@ -47,10 +47,7 @@ public class DialogueSystem : MonoBehaviour
 		List<Node> nodes = new List<Node>();
 		for (int i = 0; i < lines.Length; ++i) {
 			if (lines[i].Length == 0) continue;
-			Node adding = JsonUtility.FromJson<Node>(lines[i]);
-			adding.destinations = Utilities.GetDestinations(lines[i]);
-			adding.events = Utilities.GetEvents(lines[i]);
-			nodes.Add(adding);
+			nodes.Add(JsonUtility.FromJson<Node>(lines[i]));
 		}
 		nodes.Sort(Utilities.SortNode);
 		return nodes;
@@ -62,9 +59,7 @@ public class DialogueSystem : MonoBehaviour
 		List<Node> nodes = new List<Node>();
 		for (int i = 0; i < lines.Length; ++i) {
 			if (lines[i].Length == 0) continue;
-			Node adding = JsonUtility.FromJson<Node>(lines[i]);
-			adding.destinations = Utilities.GetDestinations(lines[i]);
-			nodes.Add(adding);
+			nodes.Add(JsonUtility.FromJson<Node>(lines[i]));
 		}
 		nodes.Sort(Utilities.SortNode);
 		return nodes;
@@ -105,36 +100,40 @@ public class DialogueSystem : MonoBehaviour
 			SetTextBox(node.body, node.speaker, node.player);
 			if (node.type == 'b') {
 				// Branching node: Populate lists of memory based choices and standard choices.
-				dests = new List<Destination>();
-				memdests = new List<MemoryDestination>();
-				string destType;
-				for (int j = 0; j < node.destinations.Count; ++j) {
-					// If a memory destination is found, add it to the list of memory destinations.
-					destType = Utilities.GetDestinationType(node.destinations[j]);
-					if (destType == "int") {
-						memdests.Add((MemoryDestinationInt)node.destinations[j]);
-					} else if (destType == "string") {
-						memdests.Add((MemoryDestinationString)node.destinations[j]);
-					} else if (destType == "bool") {
-						memdests.Add((MemoryDestinationBool)node.destinations[j]);
-					} else {
-						// If it's a normal destination, just add it to the list of destinations.
-						dests.Add(node.destinations[j]);
-					}
-				}
 				// If there are memory destinations, check all of them using the MemoryDictionary's CheckMemory method.
 				// If the MemoryCheck returns true, add it to memDests. If it is true and the memory destination is forced,
 				// set i to point to that memory.
-				if (memdests.Count > 0) {
-					for (int j = 0; j < memdests.Count; ++j) {
-						if (memories.memories.CheckMemory(memdests[j])) {
-							if (memdests[j].forced) {
-								usingMemDest = true;
-								i = memdests[j].dest;
-								break;
-							} else {
-								dests.Add(memdests[j]);
-							}
+				dests = new List<Destination>();
+				for (j = 0; j < node.intDestinations.Count; ++j) {
+					if (memories.memories.CheckMemoryInt(node.intDestinations[j])) {
+						if (node.intDestinations[j].forced) {
+							usingMemDest = true;
+							i = node.intDestinations[j].dest;
+							break;
+						} else {
+							dests.Add(node.intDestinations[j]);
+						}
+					}
+				}
+				for (j = 0; j < node.stringDestinations.Count; ++j) {
+					if (memories.memories.CheckMemoryString(node.stringDestinations[j])) {
+						if (node.stringDestinations[j].forced) {
+							usingMemDest = true;
+							i = node.stringDestinations[j].dest;
+							break;
+						} else {
+							dests.Add(node.stringDestinations[j]);
+						}
+					}
+				}
+				for (j = 0; j < node.boolDestinations.Count; ++j) {
+					if (memories.memories.CheckMemoryBool(node.boolDestinations[j])) {
+						if (node.boolDestinations[j].forced) {
+							usingMemDest = true;
+							i = node.boolDestinations[j].dest;
+							break;
+						} else {
+							dests.Add(node.boolDestinations[j]);
 						}
 					}
 				}
@@ -155,18 +154,29 @@ public class DialogueSystem : MonoBehaviour
 				i = -1;
 			}
 
-			// Manage memories.
-			if (node.memories.Count > 0) {
-				for (int j = 0; j < node.memories.Count; ++j) {
-					memories.memories.SetMemory(node.memories[j]);
-				}
+			// Manage events.
+			for (j = 0; j < node.events.Count; ++j) {
+				events.TriggerEvent(node.events[j]);
+			}
+			for (j = 0; j < node.intEvents.Count; ++j) {
+				events.TriggerEvent(node.intEvents[j]);
+			}
+			for (j = 0; j < node.stringEvents.Count; ++j) {
+				events.TriggerEvent(node.stringEvents[j]);
+			}
+			for (j = 0; j < node.boolEvents.Count; ++j) {
+				events.TriggerEvent(node.boolEvents[j]);
 			}
 
-			// Manage events.
-			if (node.events.Count > 0) {
-				for (int j = 0; j < node.events.Count; ++j) {
-					events.TriggerEvent(node.events[j]);
-				}
+			// Manage memories.
+			for (j = 0; j < node.intMemories.Count; ++j) {
+				memories.memories.SetMemoryInt(node.intMemories[j]);
+			}
+			for (j = 0; j < node.stringMemories.Count; ++j) {
+				memories.memories.SetMemoryString(node.stringMemories[j]);
+			}
+			for (j = 0; j < node.boolMemories.Count; ++j) {
+				memories.memories.SetMemoryBool(node.boolMemories[j]);
 			}
 			
 			// Wait until the player continues.
