@@ -255,6 +255,10 @@ namespace InsomniaSystemTypes {
 			dest = dest_;
 		}
 
+		public virtual string GetTemplatedType () {
+			return "NONE";
+		}
+
     }
 	[System.Serializable]
 	public class MemoryDestination<T> : Destination {
@@ -262,6 +266,11 @@ namespace InsomniaSystemTypes {
 		public T value;
 		public string checkCode = "eq";
 		public bool forced = false;
+
+		public override string GetTemplatedType () {
+			string[] type = this.GetType().GetGenericArguments()[0].ToString().Split('.');
+			return type[type.Length - 1];
+		}
 	}
 
 	/*

@@ -17,7 +17,7 @@ public class DialogueEventHandler : MonoBehaviour
 
 	public void TriggerEvent (DialogueEvent devent) {
 		string eventType = devent.GetTemplatedType();
-		if (eventType == "base") {
+		if (eventType == "NONE") {
 			for (int i = 0; i < events.Count; ++i) {
 				if (events[i].name == devent.key) {
 					events[i].uEvent.Invoke();
