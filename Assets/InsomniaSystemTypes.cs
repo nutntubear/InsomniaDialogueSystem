@@ -267,6 +267,13 @@ namespace InsomniaSystemTypes {
 		public string checkCode = "eq";
 		public bool forced = false;
 
+		public MemoryDestination (string key="", T val=default(T), string check="=", bool force=false) {
+			memoryKey = key;
+			value = val;
+			checkCode = check;
+			forced = force;
+		}
+
 		public override string GetTemplatedType () {
 			string[] type = this.GetType().GetGenericArguments()[0].ToString().Split('.');
 			return type[type.Length - 1];
