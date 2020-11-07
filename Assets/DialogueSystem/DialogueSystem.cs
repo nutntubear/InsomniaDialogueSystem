@@ -104,6 +104,9 @@ public class DialogueSystem : MonoBehaviour
 				// If the MemoryCheck returns true, add it to memDests. If it is true and the memory destination is forced,
 				// set i to point to that memory.
 				dests = new List<Destination>();
+				for (j = 0; j < node.destinations.Count; ++j) {
+					dests.Add(node.destinations[j]);
+				}
 				for (j = 0; j < node.intDestinations.Count; ++j) {
 					if (memories.memories.CheckMemoryInt(node.intDestinations[j])) {
 						if (node.intDestinations[j].forced) {

@@ -233,6 +233,11 @@ namespace InsomniaSystemTypes {
 		}
 
 		public override string GetTemplatedType () {
+			// Returns a string that indicates the type. For the base 3 types used in the DS:
+			// int = Int3d
+			// string = String
+			// bool = Boolean
+			// base = NONE
 			string[] type = this.GetType().GetGenericArguments()[0].ToString().Split('.');
 			return type[type.Length - 1];
 		}
@@ -267,7 +272,8 @@ namespace InsomniaSystemTypes {
 		public string checkCode = "eq";
 		public bool forced = false;
 
-		public MemoryDestination (string key="", T val=default(T), string check="=", bool force=false) {
+		public MemoryDestination (int dest_, string key="", T val=default(T), string check="=", bool force=false) {
+			dest = dest_;
 			memoryKey = key;
 			value = val;
 			checkCode = check;
@@ -275,6 +281,11 @@ namespace InsomniaSystemTypes {
 		}
 
 		public override string GetTemplatedType () {
+			// Returns a string that indicates the type. For the base 3 types used in the DS:
+			// int = Int3d
+			// string = String
+			// bool = Boolean
+			// base = NONE
 			string[] type = this.GetType().GetGenericArguments()[0].ToString().Split('.');
 			return type[type.Length - 1];
 		}

@@ -77,6 +77,7 @@ public class NodeManager : MonoBehaviour
 			if (nodes[destinations[i].currentDest.dest].bounds.Contains(pos)) {
 				index = i;
 				destinations.RemoveAt(index);
+				
 				if (nodes[selected].node.destinations.Count > 0) {
 					nodes[selected].node.destinations.RemoveAt(index);
 				}

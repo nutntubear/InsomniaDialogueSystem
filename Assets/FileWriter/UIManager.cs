@@ -80,7 +80,7 @@ public class UIManager : MonoBehaviour
 		if (!Directory.Exists(path)) {
 			Directory.CreateDirectory(path);
 		}
-		File.WriteAllText(path + "test2" + ".json", writeToFile);
+		File.WriteAllText(path + "test3" + ".json", writeToFile);
 	}
 
 	public void AddNode () {
@@ -186,8 +186,19 @@ public class UIManager : MonoBehaviour
 			}
 			nodes.destinations = new List<DestinationObject>();
 			// ...and add the new ones.
-			for (int i = 0; i < node.destinations.Count; ++i) {
-				AddDestinationObject(node.destinations[i], i);
+			int i = 0;
+			int total = 0;
+			for (i = 0; i < node.destinations.Count; ++i, ++total) {
+				AddDestinationObject(node.destinations[i], total);
+			}
+			for (i = 0; i < node.intDestinations.Count; ++i, ++total) {
+				AddDestinationObject(node.intDestinations[i], total);
+			}
+			for (i = 0; i < node.stringDestinations.Count; ++i, ++total) {
+				AddDestinationObject(node.stringDestinations[i], total);
+			}
+			for (i = 0; i < node.boolDestinations.Count; ++i, ++total) {
+				AddDestinationObject(node.boolDestinations[i], total);
 			}
 			// Clear events...
 			foreach (Transform child in eventList.transform) {
@@ -195,8 +206,18 @@ public class UIManager : MonoBehaviour
 			}
 			nodes.events = new List<EventObject>();
 			// ...and add the new ones.
-			for (int i = 0; i < node.events.Count; ++i) {
-				AddEventObject(node.events[i], i);
+			total = 0;
+			for (i = 0; i < node.events.Count; ++total) {
+				AddEventObject(node.events[i], total);
+			}
+			for (i = 0; i < node.intEvents.Count; ++total) {
+				AddEventObject(node.intEvents[i], total);
+			}
+			for (i = 0; i < node.stringEvents.Count; ++total) {
+				AddEventObject(node.stringEvents[i], total);
+			}
+			for (i = 0; i < node.boolEvents.Count; ++total) {
+				AddEventObject(node.boolEvents[i], total);
 			}
 		}
 	}

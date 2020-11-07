@@ -147,131 +147,221 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 79131748}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d906e66295f66d4ea1e3e75769a83f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fileName: test
+  fileName: test3
   nodes:
   - id: 0
     type: 0
-    body: Hey there!
-    speaker: Other Person
+    body: This is a test. Nothing happens in this node.
+    speaker: Speaker
     player: 0
     events: []
+    intEvents: []
+    stringEvents: []
+    boolEvents: []
+    evTotal: 0
     destinations:
     - dest: 1
-    - dest: 2
-    memories: []
+    intDestinations: []
+    stringDestinations: []
+    boolDestinations: []
+    destTotal: 1
+    intMemories: []
+    stringMemories: []
+    boolMemories: []
+    memTotal: 0
     spareData: 
     position: {x: 0, y: 0}
   - id: 1
     type: 0
-    body: Hi! How's it going?
-    speaker: Player
-    player: 1
+    body: This is a node that lowers the opacity. It also saves a memory.
+    speaker: Speaker
+    player: 0
     events: []
+    intEvents:
+    - key: LowerOpacity
+      parameter: 5
+    stringEvents: []
+    boolEvents: []
+    evTotal: 1
     destinations:
-    - dest: 3
-    memories: []
+    - dest: 2
+    intDestinations: []
+    stringDestinations: []
+    boolDestinations: []
+    destTotal: 1
+    intMemories: []
+    stringMemories: []
+    boolMemories:
+    - key: dead
+      value: 0
+    memTotal: 1
     spareData: 
     position: {x: 0, y: 0}
   - id: 2
     type: 0
-    body: '[grumble grumble]'
-    speaker: Player
-    player: 1
+    body: This has a choice.
+    speaker: Speaker
+    player: 0
     events: []
+    intEvents: []
+    stringEvents: []
+    boolEvents: []
+    evTotal: 0
     destinations:
+    - dest: 3
     - dest: 4
-    memories: []
+    - dest: 5
+    intDestinations: []
+    stringDestinations: []
+    boolDestinations: []
+    destTotal: 3
+    intMemories: []
+    stringMemories: []
+    boolMemories: []
+    memTotal: 0
     spareData: 
     position: {x: 0, y: 0}
   - id: 3
     type: 0
-    body: I'm doing alright, thanks!
-    speaker: Other Person
+    body: This is a choice. It sets dead to true.
+    speaker: Player
     player: 0
     events: []
-    destinations: []
-    memories: []
+    intEvents: []
+    stringEvents: []
+    boolEvents: []
+    evTotal: 0
+    destinations:
+    - dest: 6
+    intDestinations: []
+    stringDestinations: []
+    boolDestinations: []
+    destTotal: 1
+    intMemories: []
+    stringMemories: []
+    boolMemories:
+    - key: dead
+      value: 1
+    memTotal: 1
     spareData: 
     position: {x: 0, y: 0}
   - id: 4
     type: 0
-    body: You alright, pal?
-    speaker: Other Person
+    body: This is another choice. It sets the box to be off.
+    speaker: Player
     player: 0
-    events: []
+    events:
+    - key: DisableBox
+    intEvents: []
+    stringEvents: []
+    boolEvents: []
+    evTotal: 1
     destinations:
-    - dest: 5
     - dest: 6
-    - dest: 7
-    memories: []
+    intDestinations: []
+    stringDestinations: []
+    boolDestinations: []
+    destTotal: 1
+    intMemories: []
+    stringMemories: []
+    boolMemories: []
+    memTotal: 0
     spareData: 
     position: {x: 0, y: 0}
   - id: 5
     type: 0
-    body: Oh, huh? I'm alright.
+    body: This is another choice. It does nothing.
     speaker: Player
-    player: 1
+    player: 0
     events: []
-    destinations: []
-    memories: []
+    intEvents: []
+    stringEvents: []
+    boolEvents: []
+    evTotal: 0
+    destinations:
+    - dest: 6
+    intDestinations: []
+    stringDestinations: []
+    boolDestinations: []
+    destTotal: 0
+    intMemories: []
+    stringMemories: []
+    boolMemories: []
+    memTotal: 1
     spareData: 
     position: {x: 0, y: 0}
   - id: 6
     type: 0
-    body: Don't pal me, buddy!
-    speaker: Player
-    player: 1
+    body: This is a normal node.
+    speaker: Speaker
+    player: 0
     events: []
+    intEvents: []
+    stringEvents: []
+    boolEvents: []
+    evTotal: 0
     destinations:
+    - dest: 7
+    intDestinations: []
+    stringDestinations: []
+    boolDestinations:
     - dest: 8
-    memories: []
+      memoryKey: =
+      value: 1
+      checkCode: dead
+      forced: 1
+    destTotal: 2
+    intMemories: []
+    stringMemories: []
+    boolMemories: []
+    memTotal: 0
     spareData: 
     position: {x: 0, y: 0}
   - id: 7
     type: 0
-    body: '[grumble grumble]'
-    speaker: Player
-    player: 1
+    body: You're not dead.
+    speaker: Speaker
+    player: 0
     events: []
+    intEvents: []
+    stringEvents: []
+    boolEvents: []
+    evTotal: 0
     destinations: []
-    memories: []
+    intDestinations: []
+    stringDestinations: []
+    boolDestinations: []
+    destTotal: 0
+    intMemories: []
+    stringMemories: []
+    boolMemories: []
+    memTotal: 0
     spareData: 
     position: {x: 0, y: 0}
   - id: 8
     type: 0
-    body: Don't buddy me, guy!
-    speaker: Other Person
+    body: You're dead.
+    speaker: Speaker
     player: 0
     events: []
-    destinations:
-    - dest: 9
-    memories: []
-    spareData: 
-    position: {x: 0, y: 0}
-  - id: 9
-    type: 0
-    body: Don't guy me, friend!
-    speaker: Player
-    player: 1
-    events: []
-    destinations:
-    - dest: 10
-    memories: []
-    spareData: 
-    position: {x: 0, y: 0}
-  - id: 10
-    type: 0
-    body: Don't friend me, pal!
-    speaker: Other Person
-    player: 0
-    events: []
+    intEvents: []
+    stringEvents: []
+    boolEvents: []
+    evTotal: 0
     destinations: []
-    memories: []
+    intDestinations: []
+    stringDestinations: []
+    boolDestinations: []
+    destTotal: 0
+    intMemories: []
+    stringMemories: []
+    boolMemories: []
+    memTotal: 0
     spareData: 
     position: {x: 0, y: 0}
 --- !u!4 &79131750
@@ -1324,7 +1414,7 @@ MonoBehaviour:
   events: {fileID: 1550749739}
   memories: {fileID: 1550749741}
   dialogues:
-  - {fileID: 4900000, guid: 0c7c250d4decfd24fa33241b612d4645, type: 3}
+  - {fileID: 4900000, guid: fadbe8d852c5006459551a083855c1db, type: 3}
   fullSystem: {fileID: 0}
   regexCharacter: 37
   bodyBox: {fileID: 1447643490}

@@ -21,16 +21,16 @@ public class EventObject : MonoBehaviour
 
 	public void UpdateEvent () {
 		currentEvent.key = eventName.text;
-		string evType = Utilities.GetEventType(currentEvent);
-		if (evType == "base") return;
-		if (evType == "int") {
+		string evType = currentEvent.GetTemplatedType();
+		if (evType == "NONE") return;
+		if (evType == "Int32") {
 			int attempt = 0;
 			System.Int32.TryParse(eventParameter.text, out attempt);
-			((DialogueIntEvent)currentEvent).parameter = attempt;
-		} else if (evType == "string") {
-			((DialogueStringEvent)currentEvent).parameter = eventParameter.text;
-		} else if (evType == "bool") {
-			((DialogueBoolEvent)currentEvent).parameter = (eventParameterBoolean.value == 0);
+			((DialogueEventTemplated<int>)currentEvent).parameter = attempt;
+		} else if (evType == "String") {
+			((DialogueEventTemplated<string>)currentEvent).parameter = eventParameter.text;
+		} else if (evType == "Boolean") {
+			((DialogueEventTemplated<bool>)currentEvent).parameter = (eventParameterBoolean.value == 0);
 		}
 	}
 
@@ -50,13 +50,13 @@ public class EventObject : MonoBehaviour
 			eventParameter.text = "";
 			eventParameter.interactable = true;
 			if (val == 1) {
-				currentEvent = new DialogueIntEvent(currentEvent);
+				currentEvent = new DialogueEventTemplated<int>(currentEvent);
 				eventParameter.contentType = InputField.ContentType.IntegerNumber;
 			} else if (val == 2) {
-				currentEvent = new DialogueStringEvent(currentEvent);
+				currentEvent = new DialogueEventTemplated<string>(currentEvent);
 				eventParameter.contentType = InputField.ContentType.Alphanumeric;
 			} else if (val == 3) {
-				currentEvent = new DialogueBoolEvent(currentEvent);
+				currentEvent = new DialogueEventTemplated<bool>(currentEvent);
 				eventParameter.gameObject.SetActive(false);
 				eventParameterBoolean.gameObject.SetActive(true);
 			}
@@ -65,19 +65,19 @@ public class EventObject : MonoBehaviour
 
 	public void Setup (DialogueEvent ev) {
 		currentEvent = ev;
-		string evType = Utilities.GetEventType(currentEvent);
+		string evType = ev.GetTemplatedType();
 		eventName.text = ev.key;
-		if (evType == "int") {
+		if (evType == "Int32") {
 			eventType.value = 1;
-			eventParameter.text = ((DialogueIntEvent)ev).parameter.ToString();
-		} else if (evType == "string") {
+			eventParameter.text = ((DialogueEventTemplated<int>)ev).parameter.ToString();
+		} else if (evType == "String") {
 			eventType.value = 2;
-			eventParameter.text = ((DialogueStringEvent)ev).parameter;
-		} else if (evType == "bool") {
+			eventParameter.text = ((DialogueEventTemplated<string>)ev).parameter;
+		} else if (evType == "Boolean") {
 			eventType.value = 3;
 			eventParameter.gameObject.SetActive(false);
 			eventParameterBoolean.gameObject.SetActive(true);
-			if (((DialogueBoolEvent)ev).parameter) {
+			if (((DialogueEventTemplated<bool>)ev).parameter) {
 				eventParameterBoolean.value = 0;
 			} else {
 				eventParameterBoolean.value = 1;

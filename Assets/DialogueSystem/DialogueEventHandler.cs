@@ -23,19 +23,19 @@ public class DialogueEventHandler : MonoBehaviour
 					events[i].uEvent.Invoke();
 				}
 			}
-		} else if (eventType == "int") {
+		} else if (eventType == "Int32") {
 			for (int i = 0; i < intEvents.Count; ++i) {
 				if (intEvents[i].name == devent.key) {
 					intEvents[i].uEvent.Invoke(((DialogueEventTemplated<int>)devent).parameter);
 				}
 			}
-		} else if (eventType == "string") {
+		} else if (eventType == "String") {
 			for (int i = 0; i < stringEvents.Count; ++i) {
 				if (stringEvents[i].name == devent.key) {
 					stringEvents[i].uEvent.Invoke(((DialogueEventTemplated<string>)devent).parameter);
 				}
 			}
-		} else if (eventType == "bool") {
+		} else if (eventType == "Boolean") {
 			for (int i = 0; i < boolEvents.Count; ++i) {
 				if (boolEvents[i].name == devent.key) {
 					boolEvents[i].uEvent.Invoke(((DialogueEventTemplated<bool>)devent).parameter);

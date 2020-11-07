@@ -21,6 +21,7 @@ public class DestinationObject : MonoBehaviour
 
 	[HideInInspector]
 	public Destination currentDest = new Destination();
+	int destID;
 
 	public void SwitchType (Dropdown drop) {
 		SwitchByInt(drop.value);
@@ -28,20 +29,19 @@ public class DestinationObject : MonoBehaviour
 
 	// Used to update the currentDest variable if it is a MemoryDestination.
 	public void UpdateMemory () {
-		string destType = Utilities.GetDestinationType(currentDest);
-		if (destType == "base") return;
-		((MemoryDestination)currentDest).memoryKey = memoryName.text;
-		((MemoryDestination)currentDest).checkCode = allChecks[check.value].text;
-		((MemoryDestination)currentDest).forced = forceDestination.isOn;
-
-		if (destType == "int") {
+		string destType = currentDest.GetTemplatedType();
+		if (destType == "NONE") return;
+		if (destType == "Int32") {
 			int attempt = 0;
 			Int32.TryParse(memoryValue.text, out attempt);
-			((MemoryDestinationInt)currentDest).value = attempt;
-		} else if (destType == "string") {
-			((MemoryDestinationString)currentDest).value = memoryValue.text;
-		} else if (destType == "bool") {
-			((MemoryDestinationBool)currentDest).value = (memoryValueBoolean.value == 0);
+			currentDest = new MemoryDestination<int>(destID, memoryName.text, attempt,
+				allChecks[check.value].text, forceDestination.isOn);
+		} else if (destType == "String") {
+			currentDest = new MemoryDestination<string>(destID, memoryName.text, memoryValue.text,
+				allChecks[check.value].text, forceDestination.isOn);
+		} else if (destType == "Boolean") {
+			currentDest = new MemoryDestination<bool>(destID, memoryName.text, memoryValueBoolean.value == 0,
+				allChecks[check.value].text, forceDestination.isOn);
 		}
 	}
 
@@ -68,15 +68,15 @@ public class DestinationObject : MonoBehaviour
 			forceDestination.interactable = true;
 			// UI Settings for specific types of memory destinations:
 			if (val == 1) {
-				currentDest = new MemoryDestinationInt(currentDest);
+				currentDest = new MemoryDestination<int>(destID);
 				check.options = allChecks;
 				memoryValue.contentType = InputField.ContentType.IntegerNumber;
 				return;
 			} else if (val == 2) {
-				currentDest = new MemoryDestinationString(currentDest);
+				currentDest = new MemoryDestination<string>(destID);
 				memoryValue.contentType = InputField.ContentType.Alphanumeric;
 			} else if (val == 3) {
-				currentDest = new MemoryDestinationBool(currentDest);
+				currentDest = new MemoryDestination<bool>(destID);
 				memoryValue.gameObject.SetActive(false);
 				memoryValueBoolean.gameObject.SetActive(true);
 			}
@@ -87,26 +87,30 @@ public class DestinationObject : MonoBehaviour
 	// Setup the UI and currentDest destination; to be used when a DestinationObject is created.
 	public void Setup (Destination dest) {
 		currentDest = dest;
-		Type destinationType = dest.GetType();
-		if (destinationType == Utilities.memoryDestinationInt.GetType()) {
+		destID = dest.dest;
+		string destinationType = dest.GetTemplatedType();
+		if (destinationType == "Int32") {
 			memoryType.value = 1;
-			memoryName.text = ((MemoryDestinationInt)dest).memoryKey;
-			memoryValue.text = ((MemoryDestinationInt)dest).value.ToString();
-			forceDestination.isOn = ((MemoryDestination)dest).forced;
-		} else if (destinationType == Utilities.memoryDestinationString.GetType()) {
+			MemoryDestination<int> temp = (MemoryDestination<int>)dest;
+			memoryName.text = temp.memoryKey;
+			memoryValue.text = temp.value.ToString();
+			forceDestination.isOn = temp.forced;
+		} else if (destinationType == "String") {
+			MemoryDestination<string> temp = (MemoryDestination<string>)dest;
 			memoryType.value = 2;
-			memoryName.text = ((MemoryDestinationString)dest).memoryKey;
-			memoryValue.text = ((MemoryDestinationString)dest).value;
-			forceDestination.isOn = ((MemoryDestination)dest).forced;
-		} else if (destinationType == Utilities.memoryDestinationBool.GetType()) {
+			memoryName.text = temp.memoryKey;
+			memoryValue.text = temp.value;
+			forceDestination.isOn = temp.forced;
+		} else if (destinationType == "Boolean") {
+			MemoryDestination<bool> temp = (MemoryDestination<bool>)dest;
 			memoryType.value = 3;
-			memoryName.text = ((MemoryDestinationBool)dest).memoryKey;
-			if (((MemoryDestinationBool)dest).value) {
+			memoryName.text = temp.memoryKey;
+			if (temp.value) {
 				memoryValueBoolean.value = 0;
 			} else {
 				memoryValueBoolean.value = 1;
 			}
-			forceDestination.isOn = ((MemoryDestination)dest).forced;
+			forceDestination.isOn = temp.forced;
 		} else {
 			SwitchByInt(0);
 		}
