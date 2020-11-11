@@ -56,8 +56,7 @@ namespace InsomniaSystemTypes {
 		public int destTotal;
 		// Lists of Memories
 		//Stores player data like, items held, amount of money the player has, past dialogue
-		//choices any sort of game data that would be referenced to trigger certain
-		//dialogue events
+		//choices any sort of game data that would be referenced to trigger certain dialogue events
 		public List< Memory<int> > intMemories;
 		public List< Memory<string> > stringMemories;
 		public List< Memory<bool> > boolMemories;
@@ -150,7 +149,8 @@ namespace InsomniaSystemTypes {
 	/*
 	UnityEvent Types
 		Used for handling Dialogue Events, but each UnityEvent<type> can be used
-		for other purposes in-game.
+		for other purposes in-game. These take the keys from the DialogueEvent
+		lists and trigger them with these event pairs.
 	*/
 
 	[System.Serializable]
@@ -204,6 +204,8 @@ namespace InsomniaSystemTypes {
 		Used to trigger events in the DialogueEventHandler when the node is reached.
 		Int, String, and Bool events are used to trigger events with different parameters.
 		The base DialogueEvent class is used to trigger events without parameters.
+		Dialogue Events are not actual unity events they store keys that would then be called
+		to trigger actual unity events
 	*/
 	[System.Serializable]
 	public class DialogueEvent {
