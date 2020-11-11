@@ -10,6 +10,7 @@ namespace InsomniaSystemTypes {
 
 	/*
 	Utilities
+		Has acces to Node data, used for sorting nodes.
 	*/
 	public class Utilities {
 
@@ -29,24 +30,34 @@ namespace InsomniaSystemTypes {
 	*/
 	[System.Serializable]
 	public class Node {
-		public int id;
+		public int id; //ID is used to locate a particualr node when it is asked for
 		public char type;
 		public string body;
 		public string speaker;
 		public bool player;
+
+		/*
+		All data is excepted as a type T so once we identify what type the data is we then 
+		store it in a list of that approipate type
+		*/
 		// Lists of Dialogue Events
+		// Store keys that hold parameters to trigger normal unity events
 		public List<DialogueEvent> events;
 		public List< DialogueEventTemplated<int> > intEvents;
 		public List< DialogueEventTemplated<string> > stringEvents;
 		public List< DialogueEventTemplated<bool> > boolEvents;
 		public int evTotal;
-		// Lists of Destinations
+		// Lists of Destinations 
+		//Dialogue nodes that are connected to this one
 		public List<Destination> destinations;
 		public List< MemoryDestination<int> > intDestinations;
 		public List< MemoryDestination<string> > stringDestinations;
 		public List< MemoryDestination<bool> > boolDestinations;
 		public int destTotal;
 		// Lists of Memories
+		//Stores player data like, items held, amount of money the player has, past dialogue
+		//choices any sort of game data that would be referenced to trigger certain
+		//dialogue events
 		public List< Memory<int> > intMemories;
 		public List< Memory<string> > stringMemories;
 		public List< Memory<bool> > boolMemories;
@@ -105,7 +116,7 @@ namespace InsomniaSystemTypes {
 			SetType();
 			return JsonUtility.ToJson(this);
 		}
-
+		//Takes Dialogue from the node an outputs in to the TextBox
 		public string ToTextBox () {
 			string line1 = id.ToString() + " - ";
 			line1 += speaker.Substring(0, (int)Mathf.Clamp(11 - line1.Length, 0, speaker.Length));
