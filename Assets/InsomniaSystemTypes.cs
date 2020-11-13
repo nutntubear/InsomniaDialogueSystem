@@ -73,6 +73,7 @@ namespace InsomniaSystemTypes {
 			intEvents = new List< DialogueEventTemplated<int> >();
 			stringEvents = new List< DialogueEventTemplated<string> >();
 			boolEvents = new List< DialogueEventTemplated<bool> >();
+			evTotal = 0;
 			destinations = new List<Destination>();
 			intDestinations = new List< MemoryDestination<int> >();
 			stringDestinations = new List< MemoryDestination<string> >();
@@ -81,6 +82,7 @@ namespace InsomniaSystemTypes {
 			intMemories = new List< Memory<int> >();
 			stringMemories = new List< Memory<string> >();
 			boolMemories = new List< Memory<bool> >();
+			memTotal = 0;
 		}
 
 		public bool HasDestination (int dest) {
@@ -210,6 +212,8 @@ namespace InsomniaSystemTypes {
 	[System.Serializable]
 	public class DialogueEvent {
 		public string key;
+		// The id is used for ordering events in the file writer.
+		public int id;
 
 		public DialogueEvent (string key_="") {
 			key = key_;
@@ -268,6 +272,8 @@ namespace InsomniaSystemTypes {
 	[System.Serializable]
 	public class Destination {
 		public int dest;
+		// The id is used for ordering destinations in the file writer.
+		public int id;
 
 		public Destination (int dest_=-1) {
 			dest = dest_;
@@ -313,6 +319,8 @@ namespace InsomniaSystemTypes {
 	public class Memory<T> {
 		public string key;
 		public T value;
+		// The id is used for ordering memories in the file writer.
+		public int id;
 
 		public Memory (string k, T v) {
 			key = k;

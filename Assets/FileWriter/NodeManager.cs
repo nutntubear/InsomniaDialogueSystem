@@ -73,13 +73,41 @@ public class NodeManager : MonoBehaviour
 
 	public int DeleteDestination (Vector2 pos) {
 		int index = -1;
+		string checkType;
 		for (int i = 0; i < destinations.Count; ++i) {
+			if (index != -1) {
+				destinations[i].currentDest.id--;
+				continue;
+			}
 			if (nodes[destinations[i].currentDest.dest].bounds.Contains(pos)) {
 				index = i;
+				int destID = destinations[i].currentDest.id;
 				destinations.RemoveAt(index);
-				
-				if (nodes[selected].node.destinations.Count > 0) {
-					nodes[selected].node.destinations.RemoveAt(index);
+				checkType = destinations[i].currentDest.GetTemplatedType();
+				if (checkType == "NONE") {
+					for (int j = 0; j < nodes[selected].node.destinations.Count; ++j) {
+						if (destID == nodes[selected].node.destinations[j].id) {
+							nodes[selected].node.destinations.RemoveAt(j);
+						}
+					}
+				} else if (checkType == "Int32") {
+					for (int j = 0; j < nodes[selected].node.intDestinations.Count; ++j) {
+						if (destID == nodes[selected].node.intDestinations[j].id) {
+							nodes[selected].node.intDestinations.RemoveAt(j);
+						}
+					}
+				} else if (checkType == "String") {
+					for (int j = 0; j < nodes[selected].node.stringDestinations.Count; ++j) {
+						if (destID == nodes[selected].node.stringDestinations[j].id) {
+							nodes[selected].node.stringDestinations.RemoveAt(j);
+						}
+					}
+				} else if (checkType == "Boolean") {
+					for (int j = 0; j < nodes[selected].node.boolDestinations.Count; ++j) {
+						if (destID == nodes[selected].node.boolDestinations[j].id) {
+							nodes[selected].node.boolDestinations.RemoveAt(j);
+						}
+					}
 				}
 				break;
 			}
@@ -116,17 +144,43 @@ public class NodeManager : MonoBehaviour
 		// Destinations
 		if (node == -1) return;
 		nodes[node].node.destinations = new List<Destination>();
+		nodes[node].node.intDestinations = new List< MemoryDestination<int> >();
+		nodes[node].node.stringDestinations = new List< MemoryDestination<string> >();
+		nodes[node].node.boolDestinations = new List< MemoryDestination<bool> >();
+		string typeCheck;
 		for (int i = 0; i < destinations.Count; ++i) {
 			destinations[i].UpdateMemory();
-			nodes[node].node.destinations.Add(destinations[i].currentDest);
+			typeCheck = destinations[i].currentDest.GetTemplatedType();
+			if (typeCheck == "NONE") {
+				nodes[node].node.destinations.Add(destinations[i].currentDest);
+			} else if (typeCheck == "Int32") {
+				nodes[node].node.intDestinations.Add((MemoryDestination<int>)destinations[i].currentDest);
+			} else if (typeCheck == "String") {
+				nodes[node].node.stringDestinations.Add((MemoryDestination<string>)destinations[i].currentDest); 
+			} else if (typeCheck == "Boolean") {
+				nodes[node].node.boolDestinations.Add((MemoryDestination<bool>)destinations[i].currentDest);
+			}
 		}
+		nodes[node].node.destTotal = destinations.Count;
 		// Events
-		if (node == -1) return;
 		nodes[node].node.events = new List<DialogueEvent>();
+		nodes[node].node.intEvents = new List< DialogueEventTemplated<int> >();
+		nodes[node].node.stringEvents = new List< DialogueEventTemplated<string> >();
+		nodes[node].node.boolEvents = new List< DialogueEventTemplated<bool> >();
 		for (int i = 0; i < events.Count; ++i) {
 			events[i].UpdateEvent();
-			nodes[node].node.events.Add(events[i].currentEvent);
+			typeCheck = events[i].currentEvent.GetTemplatedType();
+			if (typeCheck == "NONE") {
+				nodes[node].node.events.Add(events[i].currentEvent);
+			} else if (typeCheck == "Int32") {
+				nodes[node].node.intEvents.Add((DialogueEventTemplated<int>)events[i].currentEvent);
+			} else if (typeCheck == "String") {
+				nodes[node].node.stringEvents.Add((DialogueEventTemplated<string>)events[i].currentEvent); 
+			} else if (typeCheck == "Boolean") {
+				nodes[node].node.boolEvents.Add((DialogueEventTemplated<bool>)events[i].currentEvent);
+			}
 		}
+		nodes[node].node.evTotal = events.Count;
 	}
 
 }

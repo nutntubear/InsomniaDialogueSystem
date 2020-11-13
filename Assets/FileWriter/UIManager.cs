@@ -121,6 +121,7 @@ public class UIManager : MonoBehaviour
 		newDest.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -60 - 120 * destinationIndex);
 		newDest.GetComponent<DestinationObject>().Setup(dest);
 		nodes.destinations.Add(newDest.GetComponent<DestinationObject>());
+		nodes.destinations[nodes.destinations.Count - 1].currentDest.id = nodes.destinations.Count - 1;
 	}
 
 	public void DeleteDestination () {
@@ -156,6 +157,7 @@ public class UIManager : MonoBehaviour
 		newEvent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -60 - 120 * eventIndex);
 		newEvent.GetComponent<EventObject>().Setup(ev);
 		nodes.events.Add(newEvent.GetComponent<EventObject>());
+		nodes.events[nodes.events.Count - 1].currentEvent.id = nodes.events.Count - 1;
 	}
 
 	public void DeleteEvent () {
@@ -186,19 +188,23 @@ public class UIManager : MonoBehaviour
 			}
 			nodes.destinations = new List<DestinationObject>();
 			// ...and add the new ones.
-			int i = 0;
-			int total = 0;
-			for (i = 0; i < node.destinations.Count; ++i, ++total) {
-				AddDestinationObject(node.destinations[i], total);
-			}
-			for (i = 0; i < node.intDestinations.Count; ++i, ++total) {
-				AddDestinationObject(node.intDestinations[i], total);
-			}
-			for (i = 0; i < node.stringDestinations.Count; ++i, ++total) {
-				AddDestinationObject(node.stringDestinations[i], total);
-			}
-			for (i = 0; i < node.boolDestinations.Count; ++i, ++total) {
-				AddDestinationObject(node.boolDestinations[i], total);
+			// Used to track the current progression in each type of destination in a node.
+			// Index 0 = base, 1 = int, 2 = string, 3 = bool.
+			int[] types = new int[] {0, 0, 0, 0};
+			for (int i = 0; i < node.destTotal; ++i) {
+				if (node.destinations.Count > 0 && node.destinations[types[0]].id == i) {
+					AddDestinationObject(node.destinations[types[0]], i);
+					types[0]++;
+				} else if (node.intDestinations.Count > 0 && node.intDestinations[types[1]].id == i) {
+					AddDestinationObject(node.intDestinations[types[1]], i);
+					types[1]++;
+				} else if (node.stringDestinations.Count > 0 && node.stringDestinations[types[2]].id == i) {
+					AddDestinationObject(node.stringDestinations[types[2]], i);
+					types[2]++;
+				} else if (node.boolDestinations.Count > 0 && node.boolDestinations[types[3]].id == i) {
+					AddDestinationObject(node.boolDestinations[types[3]], i);
+					types[3]++;
+				}
 			}
 			// Clear events...
 			foreach (Transform child in eventList.transform) {
@@ -206,18 +212,21 @@ public class UIManager : MonoBehaviour
 			}
 			nodes.events = new List<EventObject>();
 			// ...and add the new ones.
-			total = 0;
-			for (i = 0; i < node.events.Count; ++total) {
-				AddEventObject(node.events[i], total);
-			}
-			for (i = 0; i < node.intEvents.Count; ++total) {
-				AddEventObject(node.intEvents[i], total);
-			}
-			for (i = 0; i < node.stringEvents.Count; ++total) {
-				AddEventObject(node.stringEvents[i], total);
-			}
-			for (i = 0; i < node.boolEvents.Count; ++total) {
-				AddEventObject(node.boolEvents[i], total);
+			types = new int[] {0, 0, 0, 0};
+			for (int i = 0; i < node.evTotal; ++i) {
+				if (node.events.Count > 0 && node.events[types[0]].id == i) {
+					AddEventObject(node.events[types[0]], i);
+					types[0]++;
+				} else if (node.intEvents.Count > 0 && node.intEvents[types[1]].id == i) {
+					AddEventObject(node.intEvents[types[1]], i);
+					types[1]++;
+				} else if (node.stringEvents.Count > 0 && node.stringEvents[types[2]].id == i) {
+					AddEventObject(node.stringEvents[types[2]], i);
+					types[2]++;
+				} else if (node.boolEvents.Count > 0 && node.boolEvents[types[3]].id == i) {
+					AddEventObject(node.boolEvents[types[3]], i);
+					types[3]++;
+				}
 			}
 		}
 	}
