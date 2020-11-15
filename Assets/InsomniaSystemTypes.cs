@@ -319,12 +319,15 @@ namespace InsomniaSystemTypes {
 	public class Memory<T> {
 		public string key;
 		public T value;
+		// Code to change existing memories; can be "set", "+", or "-", depending on templated type.
+		public string operation;
 		// The id is used for ordering memories in the file writer.
 		public int id;
 
 		public Memory (string k, T v) {
 			key = k;
 			value = v;
+			operation = "set";
 		}
 	}
 
@@ -351,7 +354,13 @@ namespace InsomniaSystemTypes {
 		public void SetMemoryInt (Memory<int> memory) {
 			for (int i = 0; i < intMemories.Count; ++i) {
 				if (intMemories[i].key == memory.key) {
-					intMemories[i].value = memory.value;
+					if (memory.operation == "set") {
+						intMemories[i].value = memory.value;
+					} else if (memory.operation == "+") {
+						intMemories[i].value += memory.value;
+					} else if (memory.operation == "-") {
+						intMemories[i].value -= memory.value;
+					}
 					return;
 				}
 			}
@@ -360,7 +369,11 @@ namespace InsomniaSystemTypes {
 		public void SetMemoryString (Memory<string> memory) {
 			for (int i = 0; i < stringMemories.Count; ++i) {
 				if (stringMemories[i].key == memory.key) {
-					stringMemories[i].value = memory.value;
+					if (memory.operation == "set") {
+						stringMemories[i].value = memory.value;
+					} else if (memory.operation == "+") {
+						stringMemories[i].value += memory.value;
+					}
 					return;
 				}
 			}
@@ -369,6 +382,7 @@ namespace InsomniaSystemTypes {
 		public void SetMemoryBool (Memory<bool> memory) {
 			for (int i = 0; i < boolMemories.Count; ++i) {
 				if (boolMemories[i].key == memory.key) {
+					// Do not check the memory's operation, as booleans are set only.
 					boolMemories[i].value = memory.value;
 					return;
 				}
