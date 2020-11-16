@@ -12,6 +12,10 @@ public class FileTester : MonoBehaviour
 
 	public DialogueEventHandler events;
 	public DialogueMemories memories;
+    public GameObject SR;
+    public RectTransform ScrollR;
+    [System.NonSerialized]
+    public int logDepth = 0;
 
 	[Header("Text")]
 	public TextAsset[] dialogues;
@@ -96,11 +100,14 @@ public class FileTester : MonoBehaviour
 
 	public void PrintInTextBox(string s)
     {
-        print(s);
-        GameObject text = Instantiate(DebugText, GameObject.Find("Canvas").transform);
-        text.GetComponent<RectTransform>().localPosition = Vector3.zero;
+        if ((logDepth + 1) * 80 >= ScrollR.sizeDelta.y)
+        {
+            ScrollR.sizeDelta = new Vector2(0, (logDepth + 1) * 80);
+            ScrollR.anchoredPosition = new Vector2(0, -ScrollR.sizeDelta.y / 2);
+        }
+        GameObject text = Instantiate(DebugText, ScrollR);
+        text.GetComponent<RectTransform>().localPosition = new Vector2(0, -40 - 80 * logDepth);
         text.GetComponent<Text>().text = s;
-        Destroy(text, 3);
     }
 
 	// An IEnumerator to read through a dialogue file.
@@ -270,6 +277,7 @@ public class FileTester : MonoBehaviour
 
     void Start()
     {
+        //ScrollR = SR.GetComponent<RectTransform;
         StartReading(0);
     }
 
