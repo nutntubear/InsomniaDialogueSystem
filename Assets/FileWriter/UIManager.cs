@@ -136,7 +136,20 @@ public class UIManager : MonoBehaviour
 	}
 
 	public void AddMemory () {
+		mode = "";
+		AddMemoryObject(new Memory<int>("", 0), nodes.memories.Count);
+	}
 
+	void AddMemoryObject (MemoryBase mem, int memIndex) {
+		if ((memIndex + 1) * 120 >= memoryList.sizeDelta.y) {
+			memoryList.sizeDelta = new Vector2(0, (memIndex + 1) * 120);
+			memoryList.anchoredPosition = new Vector2(0, -memoryList.sizeDelta.y / 2);
+		}
+		Transform newMemory = Instantiate(memoryTemplate, memoryList).transform;
+		newMemory.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -60 - 120 * memIndex);
+		newMemory.GetComponent<MemoryObject>().Setup(mem);
+		nodes.memories.Add(newMemory.GetComponent<MemoryObject>());
+		nodes.memories[nodes.memories.Count - 1].currentMemory.id = nodes.memories.Count - 1;
 	}
 
 	public void DeleteMemory () {
@@ -226,6 +239,26 @@ public class UIManager : MonoBehaviour
 				} else if (node.boolEvents.Count > 0 && node.boolEvents[types[3]].id == i) {
 					AddEventObject(node.boolEvents[types[3]], i);
 					types[3]++;
+				}
+			}
+			// Clear memories...
+			foreach (Transform child in memoryList.transform) {
+				Destroy(child.gameObject);
+			}
+			nodes.memories = new List<MemoryObject>();
+			// ...and add the new ones.
+			// Here, types only has three members: int, string, bool.
+			types = new int[] {0, 0, 0};
+			for (int i = 0; i < node.memTotal; ++i) {
+				if (node.intMemories.Count > 0 && node.intMemories[types[0]].id == i) {
+					AddMemoryObject(node.intMemories[types[0]], i);
+					types[0]++;
+				} else if (node.stringMemories.Count > 0 && node.stringMemories[types[1]].id == i) {
+					AddMemoryObject(node.stringMemories[types[1]], i);
+					types[1]++;
+				} else if (node.boolMemories.Count > 0 && node.boolMemories[types[2]].id == i) {
+					AddMemoryObject(node.boolMemories[types[2]], i);
+					types[2]++;
 				}
 			}
 		}

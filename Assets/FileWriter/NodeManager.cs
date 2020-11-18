@@ -11,6 +11,8 @@ public class NodeManager : MonoBehaviour
 	public List<DestinationObject> destinations = new List<DestinationObject>();
 	[HideInInspector]
 	public List<EventObject> events = new List<EventObject>();
+	[HideInInspector]
+	public List<MemoryObject> memories = new List<MemoryObject>();
 	public GameObject nodePrefab;
 
 	// Temp and hidden
@@ -181,6 +183,22 @@ public class NodeManager : MonoBehaviour
 			}
 		}
 		nodes[node].node.evTotal = events.Count;
+		// Memories
+		nodes[node].node.intMemories = new List< Memory<int> >();
+		nodes[node].node.stringMemories = new List< Memory<string> >();
+		nodes[node].node.boolMemories = new List< Memory<bool> >();
+		for (int i = 0; i < memories.Count; ++i) {
+			memories[i].UpdateMemory();
+			typeCheck = memories[i].currentMemory.GetTemplatedType();
+			if (typeCheck == "Int32") {
+				nodes[node].node.intMemories.Add((Memory<int>)memories[i].currentMemory);
+			} else if (typeCheck == "String") {
+				nodes[node].node.stringMemories.Add((Memory<string>)memories[i].currentMemory); 
+			} else if (typeCheck == "Boolean") {
+				nodes[node].node.boolMemories.Add((Memory<bool>)memories[i].currentMemory);
+			}
+		}
+		nodes[node].node.memTotal = memories.Count;
 	}
 
 }

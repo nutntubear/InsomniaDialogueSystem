@@ -314,20 +314,44 @@ namespace InsomniaSystemTypes {
 	Memories
 		Contain information that can be saved and checked against.
 		Int, String, and Bool memories are used to save different types of data.
+		The type Memory inherits, MemoryBase, allows for the file writer to use one variable for any templated Memory.
 	*/
 	[System.Serializable]
-	public class Memory<T> {
+	public class MemoryBase {
 		public string key;
-		public T value;
 		// Code to change existing memories; can be "set", "+", or "-", depending on templated type.
 		public string operation;
 		// The id is used for ordering memories in the file writer.
 		public int id;
 
-		public Memory (string k, T v) {
+		public virtual string GetTemplatedType () {
+			return "NONE";
+		}
+	}
+	[System.Serializable]
+	public class Memory<T> : MemoryBase {
+		public T value;
+
+		public Memory (string k, T v, string op="set") {
 			key = k;
 			value = v;
+			operation = op;
+		}
+
+		public Memory (MemoryBase c) {
+			key = c.key;
 			operation = "set";
+			id = c.id;
+		}
+
+		public override string GetTemplatedType () {
+			// Returns a string that indicates the type. For the base 3 types used in the DS:
+			// int = Int3d
+			// string = String
+			// bool = Boolean
+			// Unlike the other GetTemplatedTypes, this should NEVER return "NONE".
+			string[] type = this.GetType().GetGenericArguments()[0].ToString().Split('.');
+			return type[type.Length - 1];
 		}
 	}
 
@@ -391,14 +415,14 @@ namespace InsomniaSystemTypes {
 		}
 
 		// Public Setters; available for other scripts outside of the dialogue system to use.
-		public void SetInt (string name, int val) {
-			this.SetMemoryInt(new Memory<int>(name, val));
+		public void SetInt (string name, int val, string operation="set") {
+			this.SetMemoryInt(new Memory<int>(name, val, operation));
 		}
-		public void SetString (string name, string val) {
-			this.SetMemoryString(new Memory<string>(name, val));
+		public void SetString (string name, string val, string operation="set") {
+			this.SetMemoryString(new Memory<string>(name, val, operation));
 		}
-		public void SetBool (string name, bool val) {
-			this.SetMemoryBool(new Memory<bool>(name, val));
+		public void SetBool (string name, bool val, string operation="set") {
+			this.SetMemoryBool(new Memory<bool>(name, val, operation));
 		}
 
 		// Value Accessors
