@@ -26,6 +26,10 @@ public class MemoryObject : MonoBehaviour
 
 	public void UpdateMemory () {
 		currentMemory.key = memoryName.text;
+		if (allOperations.Count == 0) {
+			// If a file is loaded, Start() may never have been run - somehow.
+			Start();
+		}
 		currentMemory.operation = allOperations[memoryOperation.value].text;
 		string memType = currentMemory.GetTemplatedType();
 		if (memType == "NONE") return;

@@ -275,7 +275,7 @@ namespace InsomniaSystemTypes {
 		// The id is used for ordering destinations in the file writer.
 		public int id;
 
-		public Destination (int dest_=-1) {
+		public Destination (int dest_=-1, int id=0) {
 			dest = dest_;
 		}
 
@@ -291,12 +291,25 @@ namespace InsomniaSystemTypes {
 		public string checkCode = "eq";
 		public bool forced = false;
 
-		public MemoryDestination (int dest_, string key="", T val=default(T), string check="=", bool force=false) {
+		public MemoryDestination (int dest_, int id_, string key="", T val=default(T), string check="=", bool force=false) {
 			dest = dest_;
+			id = id_;
 			memoryKey = key;
 			value = val;
 			checkCode = check;
 			forced = force;
+		}
+
+		public MemoryDestination (Destination c) {
+			dest = c.dest;
+			id = c.id;
+			Debug.Log(id);
+			if (c.GetType() == this.GetType()) {
+				memoryKey = ((MemoryDestination<T>)c).memoryKey;
+				value = ((MemoryDestination<T>)c).value;
+				checkCode = ((MemoryDestination<T>)c).checkCode;
+				forced = ((MemoryDestination<T>)c).forced;
+			}
 		}
 
 		public override string GetTemplatedType () {

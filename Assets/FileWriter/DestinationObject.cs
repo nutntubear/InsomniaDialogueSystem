@@ -30,17 +30,20 @@ public class DestinationObject : MonoBehaviour
 	// Used to update the currentDest variable if it is a MemoryDestination.
 	public void UpdateMemory () {
 		string destType = currentDest.GetTemplatedType();
+		if (allChecks.Count == 0) {
+			Start();
+		}
 		if (destType == "NONE") return;
 		if (destType == "Int32") {
 			int attempt = 0;
 			Int32.TryParse(memoryValue.text, out attempt);
-			currentDest = new MemoryDestination<int>(destID, memoryName.text, attempt,
+			currentDest = new MemoryDestination<int>(destID, currentDest.id, memoryName.text, attempt,
 				allChecks[check.value].text, forceDestination.isOn);
 		} else if (destType == "String") {
-			currentDest = new MemoryDestination<string>(destID, memoryName.text, memoryValue.text,
+			currentDest = new MemoryDestination<string>(destID, currentDest.id, memoryName.text, memoryValue.text,
 				allChecks[check.value].text, forceDestination.isOn);
 		} else if (destType == "Boolean") {
-			currentDest = new MemoryDestination<bool>(destID, memoryName.text, memoryValueBoolean.value == 0,
+			currentDest = new MemoryDestination<bool>(destID, currentDest.id, memoryName.text, memoryValueBoolean.value == 0,
 				allChecks[check.value].text, forceDestination.isOn);
 		}
 	}
@@ -54,7 +57,7 @@ public class DestinationObject : MonoBehaviour
 		memoryValue.gameObject.SetActive(true);
 		memoryValueBoolean.gameObject.SetActive(false);
 		if (val == 0) {
-			currentDest = new Destination(currentDest.dest);
+			currentDest = new Destination(currentDest.dest, currentDest.id);
 			memoryName.text = "";
 			memoryName.interactable = false;
 			memoryValue.interactable = false;
@@ -68,15 +71,15 @@ public class DestinationObject : MonoBehaviour
 			forceDestination.interactable = true;
 			// UI Settings for specific types of memory destinations:
 			if (val == 1) {
-				currentDest = new MemoryDestination<int>(destID);
+				currentDest = new MemoryDestination<int>(destID, currentDest.id);
 				check.options = allChecks;
 				memoryValue.contentType = InputField.ContentType.IntegerNumber;
 				return;
 			} else if (val == 2) {
-				currentDest = new MemoryDestination<string>(destID);
+				currentDest = new MemoryDestination<string>(destID, currentDest.id);
 				memoryValue.contentType = InputField.ContentType.Alphanumeric;
 			} else if (val == 3) {
-				currentDest = new MemoryDestination<bool>(destID);
+				currentDest = new MemoryDestination<bool>(destID, currentDest.id);
 				memoryValue.gameObject.SetActive(false);
 				memoryValueBoolean.gameObject.SetActive(true);
 			}
@@ -91,18 +94,18 @@ public class DestinationObject : MonoBehaviour
 		string destinationType = dest.GetTemplatedType();
 		if (destinationType == "Int32") {
 			memoryType.value = 1;
-			MemoryDestination<int> temp = (MemoryDestination<int>)dest;
+			MemoryDestination<int> temp = new MemoryDestination<int>(dest);
 			memoryName.text = temp.memoryKey;
 			memoryValue.text = temp.value.ToString();
 			forceDestination.isOn = temp.forced;
 		} else if (destinationType == "String") {
-			MemoryDestination<string> temp = (MemoryDestination<string>)dest;
+			MemoryDestination<string> temp = new MemoryDestination<string>(dest);
 			memoryType.value = 2;
 			memoryName.text = temp.memoryKey;
 			memoryValue.text = temp.value;
 			forceDestination.isOn = temp.forced;
 		} else if (destinationType == "Boolean") {
-			MemoryDestination<bool> temp = (MemoryDestination<bool>)dest;
+			MemoryDestination<bool> temp = new MemoryDestination<bool>(dest);
 			memoryType.value = 3;
 			memoryName.text = temp.memoryKey;
 			if (temp.value) {

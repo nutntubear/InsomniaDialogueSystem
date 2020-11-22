@@ -205,18 +205,33 @@ public class UIManager : MonoBehaviour
 			// Index 0 = base, 1 = int, 2 = string, 3 = bool.
 			int[] types = new int[] {0, 0, 0, 0};
 			for (int i = 0; i < node.destTotal; ++i) {
-				if (node.destinations.Count > 0 && node.destinations[types[0]].id == i) {
-					AddDestinationObject(node.destinations[types[0]], i);
-					types[0]++;
-				} else if (node.intDestinations.Count > 0 && node.intDestinations[types[1]].id == i) {
-					AddDestinationObject(node.intDestinations[types[1]], i);
-					types[1]++;
-				} else if (node.stringDestinations.Count > 0 && node.stringDestinations[types[2]].id == i) {
-					AddDestinationObject(node.stringDestinations[types[2]], i);
-					types[2]++;
-				} else if (node.boolDestinations.Count > 0 && node.boolDestinations[types[3]].id == i) {
-					AddDestinationObject(node.boolDestinations[types[3]], i);
-					types[3]++;
+				if (node.destinations.Count > types[0]) {
+					if (node.destinations[types[0]].id == i) {
+						AddDestinationObject(node.destinations[types[0]], i);
+						types[0]++;
+						continue;
+					}
+				}
+				if (node.intDestinations.Count > types[1]) {
+					if (node.intDestinations[types[1]].id == i) {
+						AddDestinationObject(node.intDestinations[types[1]], i);
+						types[1]++;
+						continue;
+					}
+				}
+				if (node.stringDestinations.Count > types[2]) {
+					if (node.stringDestinations[types[2]].id == i) {
+						AddDestinationObject(node.stringDestinations[types[2]], i);
+						types[2]++;
+						continue;
+					}
+				}
+				if (node.boolDestinations.Count > types[3]) {
+					if (node.boolDestinations[types[3]].id == i) {
+						AddDestinationObject(node.boolDestinations[types[3]], i);
+						types[3]++;
+						continue;
+					}
 				}
 			}
 			// Clear events...

@@ -150,7 +150,9 @@ public class NodeManager : MonoBehaviour
 		nodes[node].node.stringDestinations = new List< MemoryDestination<string> >();
 		nodes[node].node.boolDestinations = new List< MemoryDestination<bool> >();
 		string typeCheck;
+		print(destinations.Count);
 		for (int i = 0; i < destinations.Count; ++i) {
+			print(i);
 			destinations[i].UpdateMemory();
 			typeCheck = destinations[i].currentDest.GetTemplatedType();
 			if (typeCheck == "NONE") {
@@ -160,7 +162,9 @@ public class NodeManager : MonoBehaviour
 			} else if (typeCheck == "String") {
 				nodes[node].node.stringDestinations.Add((MemoryDestination<string>)destinations[i].currentDest); 
 			} else if (typeCheck == "Boolean") {
+				print(destinations[i].currentDest.id);
 				nodes[node].node.boolDestinations.Add((MemoryDestination<bool>)destinations[i].currentDest);
+				print(nodes[node].node.boolDestinations[nodes[node].node.boolDestinations.Count - 1].id);
 			}
 		}
 		nodes[node].node.destTotal = destinations.Count;
@@ -199,6 +203,19 @@ public class NodeManager : MonoBehaviour
 			}
 		}
 		nodes[node].node.memTotal = memories.Count;
+	}
+
+	void Start () {
+		if (SaveLoad.instance.loadingFile != null) {
+			Node temp;
+			for (int i = 0; i < SaveLoad.instance.loadingFile.Length; ++i) {
+				temp = JsonUtility.FromJson<Node>(SaveLoad.instance.loadingFile[i]);
+				CreateNode(temp.position);
+				nodes[nodes.Count - 1].node = temp;
+				nodes[nodes.Count - 1].SetText();
+			}
+			SaveLoad.instance.loadingFile = null;
+		}
 	}
 
 }
