@@ -11,6 +11,8 @@ public class NodeManager : MonoBehaviour
 	public List<DestinationObject> destinations = new List<DestinationObject>();
 	[HideInInspector]
 	public List<EventObject> events = new List<EventObject>();
+	[HideInInspector]
+	public List<MemoryObject> memories = new List<MemoryObject>();
 	public GameObject nodePrefab;
 
 	// Temp and hidden
@@ -148,7 +150,9 @@ public class NodeManager : MonoBehaviour
 		nodes[node].node.stringDestinations = new List< MemoryDestination<string> >();
 		nodes[node].node.boolDestinations = new List< MemoryDestination<bool> >();
 		string typeCheck;
+		print(destinations.Count);
 		for (int i = 0; i < destinations.Count; ++i) {
+			print(i);
 			destinations[i].UpdateMemory();
 			typeCheck = destinations[i].currentDest.GetTemplatedType();
 			if (typeCheck == "NONE") {
@@ -158,7 +162,9 @@ public class NodeManager : MonoBehaviour
 			} else if (typeCheck == "String") {
 				nodes[node].node.stringDestinations.Add((MemoryDestination<string>)destinations[i].currentDest); 
 			} else if (typeCheck == "Boolean") {
+				print(destinations[i].currentDest.id);
 				nodes[node].node.boolDestinations.Add((MemoryDestination<bool>)destinations[i].currentDest);
+				print(nodes[node].node.boolDestinations[nodes[node].node.boolDestinations.Count - 1].id);
 			}
 		}
 		nodes[node].node.destTotal = destinations.Count;
@@ -181,6 +187,35 @@ public class NodeManager : MonoBehaviour
 			}
 		}
 		nodes[node].node.evTotal = events.Count;
+		// Memories
+		nodes[node].node.intMemories = new List< Memory<int> >();
+		nodes[node].node.stringMemories = new List< Memory<string> >();
+		nodes[node].node.boolMemories = new List< Memory<bool> >();
+		for (int i = 0; i < memories.Count; ++i) {
+			memories[i].UpdateMemory();
+			typeCheck = memories[i].currentMemory.GetTemplatedType();
+			if (typeCheck == "Int32") {
+				nodes[node].node.intMemories.Add((Memory<int>)memories[i].currentMemory);
+			} else if (typeCheck == "String") {
+				nodes[node].node.stringMemories.Add((Memory<string>)memories[i].currentMemory); 
+			} else if (typeCheck == "Boolean") {
+				nodes[node].node.boolMemories.Add((Memory<bool>)memories[i].currentMemory);
+			}
+		}
+		nodes[node].node.memTotal = memories.Count;
+	}
+
+	void Start () {
+		if (SaveLoad.instance.loadingFile != null) {
+			Node temp;
+			for (int i = 0; i < SaveLoad.instance.loadingFile.Length; ++i) {
+				temp = JsonUtility.FromJson<Node>(SaveLoad.instance.loadingFile[i]);
+				CreateNode(temp.position);
+				nodes[nodes.Count - 1].node = temp;
+				nodes[nodes.Count - 1].SetText();
+			}
+			SaveLoad.instance.loadingFile = null;
+		}
 	}
 
 }
