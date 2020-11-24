@@ -21,6 +21,12 @@ public class NodeManager : MonoBehaviour
 
 	int dummy = 0;
 
+	// Sort of singleton. On Awake, instance is set, regardless of whether it's set already.
+	public static NodeManager instance;
+	void Awake () {
+		instance = this;
+	}
+
 	bool CheckInsideNode (Vector2 pos, ref int id, int ignore=-1, int scale=1) {
 		id = -1;
 		for (int i = 0; i < nodes.Count; ++i) {

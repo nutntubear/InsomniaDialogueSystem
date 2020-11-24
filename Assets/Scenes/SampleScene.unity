@@ -166,6 +166,7 @@ MonoBehaviour:
     evTotal: 0
     destinations:
     - dest: 1
+      id: 0
     intDestinations: []
     stringDestinations: []
     boolDestinations: []
@@ -184,12 +185,14 @@ MonoBehaviour:
     events: []
     intEvents:
     - key: LowerOpacity
+      id: 0
       parameter: 5
     stringEvents: []
     boolEvents: []
     evTotal: 1
     destinations:
     - dest: 2
+      id: 0
     intDestinations: []
     stringDestinations: []
     boolDestinations: []
@@ -198,6 +201,8 @@ MonoBehaviour:
     stringMemories: []
     boolMemories:
     - key: dead
+      operation: 
+      id: 0
       value: 0
     memTotal: 1
     spareData: 
@@ -214,8 +219,11 @@ MonoBehaviour:
     evTotal: 0
     destinations:
     - dest: 3
+      id: 0
     - dest: 4
+      id: 0
     - dest: 5
+      id: 0
     intDestinations: []
     stringDestinations: []
     boolDestinations: []
@@ -238,6 +246,7 @@ MonoBehaviour:
     evTotal: 0
     destinations:
     - dest: 6
+      id: 0
     intDestinations: []
     stringDestinations: []
     boolDestinations: []
@@ -246,6 +255,8 @@ MonoBehaviour:
     stringMemories: []
     boolMemories:
     - key: dead
+      operation: 
+      id: 0
       value: 1
     memTotal: 1
     spareData: 
@@ -257,12 +268,14 @@ MonoBehaviour:
     player: 0
     events:
     - key: DisableBox
+      id: 0
     intEvents: []
     stringEvents: []
     boolEvents: []
     evTotal: 1
     destinations:
     - dest: 6
+      id: 0
     intDestinations: []
     stringDestinations: []
     boolDestinations: []
@@ -285,6 +298,7 @@ MonoBehaviour:
     evTotal: 0
     destinations:
     - dest: 6
+      id: 0
     intDestinations: []
     stringDestinations: []
     boolDestinations: []
@@ -307,10 +321,12 @@ MonoBehaviour:
     evTotal: 0
     destinations:
     - dest: 7
+      id: 0
     intDestinations: []
     stringDestinations: []
     boolDestinations:
     - dest: 8
+      id: 0
       memoryKey: =
       value: 1
       checkCode: dead
@@ -1392,12 +1408,18 @@ MonoBehaviour:
   memories:
     intMemories:
     - key: money
+      operation: 
+      id: 0
       value: 100
     stringMemories:
     - key: name
+      operation: 
+      id: 0
       value: Bob
     boolMemories:
     - key: dead
+      operation: 
+      id: 0
       value: 1
 --- !u!114 &1550749742
 MonoBehaviour:
@@ -1414,7 +1436,7 @@ MonoBehaviour:
   events: {fileID: 1550749739}
   memories: {fileID: 1550749741}
   dialogues:
-  - {fileID: 4900000, guid: fadbe8d852c5006459551a083855c1db, type: 3}
+  - {fileID: 4900000, guid: 0cf5361465621c0468f2363de2150383, type: 3}
   fullSystem: {fileID: 0}
   regexCharacter: 37
   bodyBox: {fileID: 1447643490}

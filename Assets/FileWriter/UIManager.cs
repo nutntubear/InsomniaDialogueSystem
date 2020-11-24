@@ -308,15 +308,11 @@ public class UIManager : MonoBehaviour
 	}
 
 	void Update () {
+		if (SaveLoad.instance.paused) {
+			return;
+		}
 		if (Input.GetKeyDown("space") && !paused && !IsTyping()) {
 			nodePanel.SetActive(!nodePanel.activeSelf);
-		}
-		if (Input.GetKeyDown("escape")) {
-			paused = !paused;
-			pauseScreen.SetActive(paused);
-		}
-		if (paused) {
-			return;
 		}
 		// Mouse control:
 		Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
