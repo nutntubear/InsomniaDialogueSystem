@@ -11,8 +11,9 @@ public class CameraControl : MonoBehaviour
 	[Header("Movement")]
 	public int minZoom = 5;
 	public int maxZoom = 20;
-	float currentZoom = 5;
+	float currentZoom;
 	public float zoomRate = 1.5f;
+	public float zoomSensitivity = 15;
 	public float planeSize = 1000;
 
 	[HideInInspector]
@@ -25,16 +26,16 @@ public class CameraControl : MonoBehaviour
 			mainCam = GetComponent<Camera>();
 		}
 		uim = GetComponent<UIManager>();
+		currentZoom = mainCam.orthographicSize;
 	}
 
 	void Update () {
-		if (uim.paused || hoveringOver) return;
+		if (uim.paused || hoveringOver || SaveLoad.instance.paused) return;
 		if (Input.mouseScrollDelta.y != 0) {
 			// Camera zooming.
-			currentZoom += Input.mouseScrollDelta.y * Time.deltaTime * -zoomRate;
-			if (currentZoom > maxZoom) currentZoom = maxZoom;
-			if (currentZoom < minZoom) currentZoom = minZoom;
-			mainCam.orthographicSize = currentZoom;
+			currentZoom -= Input.mouseScrollDelta.y * zoomSensitivity;
+			currentZoom = Mathf.Clamp(currentZoom, minZoom, maxZoom);
+			mainCam.orthographicSize = Mathf.Lerp(mainCam.orthographicSize, currentZoom, Time.deltaTime * zoomRate);
 		}
 		if (Input.GetMouseButtonDown(0)) {
 			// Start camera movement.

@@ -12,6 +12,8 @@ public class EventObject : MonoBehaviour
 	public InputField eventParameter;
 	public Dropdown eventParameterBoolean;
 
+	public GameObject deleteButton;
+
 	[HideInInspector]
 	public DialogueEvent currentEvent = new DialogueEvent();
 
@@ -85,6 +87,10 @@ public class EventObject : MonoBehaviour
 		} else {
 			SwitchByInt(0);
 		}
+	}
+
+	public void SelectForDelete () {
+		NodeManager.instance.DeleteEvent(currentEvent.id);
 	}
 
 }

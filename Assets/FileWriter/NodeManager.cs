@@ -6,7 +6,10 @@ using InsomniaSystemTypes;
 public class NodeManager : MonoBehaviour
 {
 
+	public UIManager ui;
+
 	public List<TextNode> nodes = new List<TextNode>();
+	public Dictionary<string, LineRenderer> connections = new Dictionary<string, LineRenderer>();
 	[HideInInspector]
 	public List<DestinationObject> destinations = new List<DestinationObject>();
 	[HideInInspector]
@@ -14,6 +17,7 @@ public class NodeManager : MonoBehaviour
 	[HideInInspector]
 	public List<MemoryObject> memories = new List<MemoryObject>();
 	public GameObject nodePrefab;
+	public GameObject connectionPrefab;
 
 	// Temp and hidden
 	int selected = -1;
@@ -121,6 +125,36 @@ public class NodeManager : MonoBehaviour
 			}
 		}
 		return index;
+	}
+
+	public void SetMemoriesDelete (bool set) {
+		for (int i = 0; i < memories.Count; ++i) {
+			memories[i].deleteButton.SetActive(set);
+		}
+	}
+
+	public void DeleteMemory (int id) {
+		Destroy(memories[id].gameObject);
+		memories.RemoveAt(id);
+		for (int i = id; i < memories.Count; ++i) {
+			memories[i].currentMemory.id--;
+			ui.AdjustScrollRectMember(memories[i].gameObject.GetComponent<RectTransform>(), i);
+		}
+	}
+
+	public void SetEventsDelete (bool set) {
+		for (int i = 0; i < events.Count; ++i) {
+			events[i].deleteButton.SetActive(set);
+		}
+	}
+
+	public void DeleteEvent (int id) {
+		Destroy(events[id].gameObject);
+		events.RemoveAt(id);
+		for (int i = id; i < events.Count; ++i) {
+			events[i].currentEvent.id--;
+			ui.AdjustScrollRectMember(events[i].gameObject.GetComponent<RectTransform>(), i);
+		}
 	}
 
 	public int SelectNode (Vector2 pos) {

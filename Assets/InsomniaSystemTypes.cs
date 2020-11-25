@@ -303,7 +303,6 @@ namespace InsomniaSystemTypes {
 		public MemoryDestination (Destination c) {
 			dest = c.dest;
 			id = c.id;
-			Debug.Log(id);
 			if (c.GetType() == this.GetType()) {
 				memoryKey = ((MemoryDestination<T>)c).memoryKey;
 				value = ((MemoryDestination<T>)c).value;

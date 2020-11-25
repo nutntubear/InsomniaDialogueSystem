@@ -13,6 +13,8 @@ public class MemoryObject : MonoBehaviour
 	public InputField memoryValue;
 	public Dropdown memoryValueBoolean;
 
+	public GameObject deleteButton;
+
 	[HideInInspector]
 	public MemoryBase currentMemory;
 
@@ -20,7 +22,7 @@ public class MemoryObject : MonoBehaviour
 	static List<Dropdown.OptionData> setAddOperations = new List<Dropdown.OptionData>();
 	static List<Dropdown.OptionData> setOnlyOperations = new List<Dropdown.OptionData>();
 
-		public void SwitchType (Dropdown drop) {
+	public void SwitchType (Dropdown drop) {
 		SwitchByInt(drop.value);
 	}
 
@@ -94,6 +96,10 @@ public class MemoryObject : MonoBehaviour
 			}
 			memoryOperation.options = setOnlyOperations;
 		}
+	}
+
+	public void SelectForDelete () {
+		NodeManager.instance.DeleteMemory(currentMemory.id);
 	}
 
 	void Start () {

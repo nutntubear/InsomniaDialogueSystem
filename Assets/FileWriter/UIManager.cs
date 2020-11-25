@@ -62,25 +62,19 @@ public class UIManager : MonoBehaviour
 	}
 
 	public void SetAvailableButtons () {
+		if (mode == "deleteMem") {
+			nodes.SetMemoriesDelete(false);
+		}
+		if (mode == "deleteEvent") {
+			nodes.SetEventsDelete(false);
+		}
 		for (int i = 0; i < buttons.Count; ++i) {
 			buttons[i].color = enabledButton;
 		}
 	}
 
-	public void NewFile () {
-		UnityEngine.SceneManagement.SceneManager.LoadScene("main");
-	}
-
-	public void SaveFile () {
-		string writeToFile = "";
-		for (int i = 0; i < nodes.nodes.Count; ++i) {
-			writeToFile += nodes.nodes[i].node.SaveNode() + "\n";
-		}
-		string path = Application.dataPath + "/TestFiles/";
-		if (!Directory.Exists(path)) {
-			Directory.CreateDirectory(path);
-		}
-		File.WriteAllText(path + "test3" + ".json", writeToFile);
+	public void AdjustScrollRectMember (RectTransform obj, int position) {
+		obj.anchoredPosition = new Vector2(0, -60 - 120 * position);
 	}
 
 	public void AddNode () {
@@ -153,7 +147,16 @@ public class UIManager : MonoBehaviour
 	}
 
 	public void DeleteMemory () {
-
+		if (mode == "deleteMem") {
+			mode = "";
+			SetAvailableButtons();
+			destinationGuide.text = "";
+			nodes.SetMemoriesDelete(false);
+		} else {
+			mode = "deleteMem";
+			destinationGuide.text = "Click a memory to remove.";
+			nodes.SetMemoriesDelete(true);
+		}
 	}
 
 	public void AddEvent () {
@@ -174,7 +177,16 @@ public class UIManager : MonoBehaviour
 	}
 
 	public void DeleteEvent () {
-
+		if (mode == "deleteEvent") {
+			mode = "";
+			SetAvailableButtons();
+			destinationGuide.text = "";
+			nodes.SetEventsDelete(false);
+		} else {
+			mode = "deleteEvent";
+			destinationGuide.text = "Click an event to remove.";
+			nodes.SetEventsDelete(true);
+		}
 	}
 
 	public void UpdateNode () {
