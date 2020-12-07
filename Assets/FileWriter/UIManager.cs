@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -114,8 +114,7 @@ public class UIManager : MonoBehaviour
 		Transform newDest = Instantiate(destinationTemplate, destinationList).transform;
 		newDest.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -60 - 120 * destinationIndex);
 		newDest.GetComponent<DestinationObject>().Setup(dest);
-		nodes.destinations.Add(newDest.GetComponent<DestinationObject>());
-		nodes.destinations[nodes.destinations.Count - 1].currentDest.id = nodes.destinations.Count - 1;
+		nodes.AddDestinationToManager(newDest.GetComponent<DestinationObject>());
 	}
 
 	public void DeleteDestination () {
@@ -126,6 +125,15 @@ public class UIManager : MonoBehaviour
 		} else {
 			mode = "deleteDest";
 			destinationGuide.text = "Click a node to remove.";
+		}
+	}
+
+	public void RemoveDestinationObject (int id) {
+		Destroy(destinationList.transform.GetChild(id).gameObject);
+		for (int i = id; i < destinationList.transform.childCount; ++i) {
+			destinationList.transform.GetChild(i).GetComponent<RectTransform>().anchoredPosition +=
+				new Vector2(0, 120);
+			destinationGuide.text = "";
 		}
 	}
 
@@ -335,29 +343,26 @@ public class UIManager : MonoBehaviour
 					SetAvailableButtons();
 				}
 			} else if (mode == "delete") {
-				if (nodes.DeleteNode(mousePos)) {
+				int deleted = nodes.DeleteNode(mousePos);
+				if (deleted != -1) {
 					mode = "";
 					SetAvailableButtons();
 					SwitchNode(-1);
+					if (deleted == showing) showing = -1;
 				}
 			} else if (mode == "addDest") {
 				int dest = nodes.AddDestination(mousePos);
 				if (dest != -1 && !nodes.nodes[showing].node.HasDestination(dest)) {
 					mode = "";
-					SetAvailableButtons();
 					AddDestinationObject(new Destination(dest), nodes.destinations.Count);
 					destinationGuide.text = "";
+					SetAvailableButtons();
 				}
 			} else if (mode == "deleteDest") {
 				int dest = nodes.DeleteDestination(mousePos);
 				if (dest != -1) {
 					mode = "";
-					Destroy(destinationList.transform.GetChild(dest).gameObject);
-					for (int i = dest; i < destinationList.transform.childCount; ++i) {
-						destinationList.transform.GetChild(i).GetComponent<RectTransform>().anchoredPosition +=
-							new Vector2(0, 120);
-						destinationGuide.text = "";
-					}
+					RemoveDestinationObject(dest);
 				}
 			} else if (mode == "") {
 				nodes.UpdateAll(showing);
@@ -383,6 +388,7 @@ public class UIManager : MonoBehaviour
 
 		if (mode == "moving") {
 			nodes.nodes[lifted].transform.position = (Vector3)mousePos + liftedDepth;
+			nodes.MoveConnection(mousePos);
 		}
 	}
 

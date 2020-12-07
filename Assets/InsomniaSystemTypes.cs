@@ -30,7 +30,7 @@ namespace InsomniaSystemTypes {
 	*/
 	[System.Serializable]
 	public class Node {
-		public int id; //ID is used to locate a particualr node when it is asked for
+		public int id; //ID is used to locate a particular node when it is asked for
 		public char type;
 		public string body;
 		public string speaker;

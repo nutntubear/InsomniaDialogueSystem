@@ -16,4 +16,8 @@ public class UIHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 		control.hoveringOver = false;
 	}
 
+	void OnDisable () {
+		control.hoveringOver = false;
+	}
+
 }

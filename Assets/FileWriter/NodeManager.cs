@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using InsomniaSystemTypes;
@@ -10,6 +10,9 @@ public class NodeManager : MonoBehaviour
 
 	public List<TextNode> nodes = new List<TextNode>();
 	public Dictionary<string, LineRenderer> connections = new Dictionary<string, LineRenderer>();
+	// Lists of LineRenderers being changed while a node is moved.
+	public List<LineRenderer> activeFromConnections = new List<LineRenderer>();
+	public List<LineRenderer> activeToConnections = new List<LineRenderer>();
 	[HideInInspector]
 	public List<DestinationObject> destinations = new List<DestinationObject>();
 	[HideInInspector]
@@ -20,7 +23,7 @@ public class NodeManager : MonoBehaviour
 	public GameObject connectionPrefab;
 
 	// Temp and hidden
-	int selected = -1;
+	public int selected = -1;
 	Bounds temp;
 
 	int dummy = 0;
@@ -53,15 +56,48 @@ public class NodeManager : MonoBehaviour
 		return true;
 	}
 
-	public bool DeleteNode (Vector2 pos) {
+	public int DeleteNode (Vector2 pos) {
 		int id = -1;
-		if (!CheckInsideNode(pos, ref id)) return false;
+		if (!CheckInsideNode(pos, ref id)) return -1;
 		// Remove all of the destinations that lead to this node.
 		for (int i = 0; i < nodes.Count; ++i) {
 			for (int j = 0; j < nodes[i].node.destinations.Count; ++j) {
 				if (nodes[i].node.destinations[j].dest == id) {
 					nodes[i].node.destinations.RemoveAt(j);
+					RemoveConnection(nodes[i].node.id, id);
 					j--;
+				}
+			}
+			for (int j = 0; j < nodes[i].node.intDestinations.Count; ++j) {
+				if (nodes[i].node.intDestinations[j].dest == id) {
+					nodes[i].node.intDestinations.RemoveAt(j);
+					RemoveConnection(nodes[i].node.id, id);
+					j--;
+				}
+			}
+			for (int j = 0; j < nodes[i].node.stringDestinations.Count; ++j) {
+				if (nodes[i].node.stringDestinations[j].dest == id) {
+					nodes[i].node.stringDestinations.RemoveAt(j);
+					RemoveConnection(nodes[i].node.id, id);
+					j--;
+				}
+			}
+			for (int j = 0; j < nodes[i].node.boolDestinations.Count; ++j) {
+				if (nodes[i].node.boolDestinations[j].dest == id) {
+					nodes[i].node.boolDestinations.RemoveAt(j);
+					RemoveConnection(nodes[i].node.id, id);
+					j--;
+				}
+			}
+			bool found = false;
+			// Also check through temporary destinations:
+			for (int j = 0; j < destinations.Count; ++j) {
+				if (found) {
+					destinations[j].currentDest.id--;
+				} else if (destinations[j].currentDest.dest == id) {
+					found = true;
+					ui.RemoveDestinationObject(destinations[j].currentDest.id);
+					RemoveConnection(destinations[j].currentDest.dest, id);
 				}
 			}
 		}
@@ -71,16 +107,42 @@ public class NodeManager : MonoBehaviour
 				nodes[i].node.id--;
 			}
 		}
+		// Finally, remove any connections it has with other nodes.
+		for (int i = 0; i < nodes[id].node.destinations.Count; ++i) {
+			RemoveConnection(id, nodes[id].node.destinations[i].dest);
+		}
+		for (int i = 0; i < nodes[id].node.intDestinations.Count; ++i) {
+			RemoveConnection(id, nodes[id].node.intDestinations[i].dest);
+		}
+		for (int i = 0; i < nodes[id].node.stringDestinations.Count; ++i) {
+			RemoveConnection(id, nodes[id].node.stringDestinations[i].dest);
+		}
+		for (int i = 0; i < nodes[id].node.boolDestinations.Count; ++i) {
+			RemoveConnection(id, nodes[id].node.boolDestinations[i].dest);
+		}
 		Destroy(nodes[id].gameObject);
 		nodes.RemoveAt(id);
 		TextNode.id--;
-		return true;
+		if (id == selected) selected = -1;
+		return id;
 	}
 
 	public int AddDestination (Vector2 pos) {
 		int id = -1;
 		CheckInsideNode(pos, ref id);
 		return id;
+	}
+
+	public void AddDestinationToManager (DestinationObject dest) {
+		// Add destination.
+		dest.currentDest.id = destinations.Count;
+		destinations.Add(dest);
+		// Add connection.
+		string key = selected.ToString() + 'x' + dest.currentDest.dest.ToString();
+		LineRenderer newConnection = Instantiate(connectionPrefab, transform).transform.GetComponent<LineRenderer>();
+		newConnection.SetPosition(0, nodes[selected].node.position);
+		newConnection.SetPosition(1, nodes[dest.currentDest.dest].node.position);
+		connections[key] = newConnection;
 	}
 
 	public int DeleteDestination (Vector2 pos) {
@@ -94,37 +156,54 @@ public class NodeManager : MonoBehaviour
 			if (nodes[destinations[i].currentDest.dest].bounds.Contains(pos)) {
 				index = i;
 				int destID = destinations[i].currentDest.id;
-				destinations.RemoveAt(index);
+				int destIndex = destinations[i].currentDest.dest;
 				checkType = destinations[i].currentDest.GetTemplatedType();
+				destinations.RemoveAt(index);
 				if (checkType == "NONE") {
-					for (int j = 0; j < nodes[selected].node.destinations.Count; ++j) {
-						if (destID == nodes[selected].node.destinations[j].id) {
-							nodes[selected].node.destinations.RemoveAt(j);
+					if (nodes[selected].node.destinations.Count != 0) {
+						for (int j = 0; j < nodes[selected].node.destinations.Count; ++j) {
+							if (destID == nodes[selected].node.destinations[j].id) {
+								nodes[selected].node.destinations.RemoveAt(j);
+							}
 						}
 					}
 				} else if (checkType == "Int32") {
-					for (int j = 0; j < nodes[selected].node.intDestinations.Count; ++j) {
-						if (destID == nodes[selected].node.intDestinations[j].id) {
-							nodes[selected].node.intDestinations.RemoveAt(j);
+					if (nodes[selected].node.intDestinations.Count != 0) {
+						for (int j = 0; j < nodes[selected].node.intDestinations.Count; ++j) {
+							if (destID == nodes[selected].node.intDestinations[j].id) {
+								nodes[selected].node.intDestinations.RemoveAt(j);
+							}
 						}
 					}
 				} else if (checkType == "String") {
-					for (int j = 0; j < nodes[selected].node.stringDestinations.Count; ++j) {
-						if (destID == nodes[selected].node.stringDestinations[j].id) {
-							nodes[selected].node.stringDestinations.RemoveAt(j);
+					if (nodes[selected].node.stringDestinations.Count != 0) {
+						for (int j = 0; j < nodes[selected].node.stringDestinations.Count; ++j) {
+							if (destID == nodes[selected].node.stringDestinations[j].id) {
+								nodes[selected].node.stringDestinations.RemoveAt(j);
+							}
 						}
 					}
 				} else if (checkType == "Boolean") {
-					for (int j = 0; j < nodes[selected].node.boolDestinations.Count; ++j) {
-						if (destID == nodes[selected].node.boolDestinations[j].id) {
-							nodes[selected].node.boolDestinations.RemoveAt(j);
+					if (nodes[selected].node.boolDestinations.Count != 0) {
+						for (int j = 0; j < nodes[selected].node.boolDestinations.Count; ++j) {
+							if (destID == nodes[selected].node.boolDestinations[j].id) {
+								nodes[selected].node.boolDestinations.RemoveAt(j);
+							}
 						}
 					}
 				}
-				break;
+				// Remove the connection.
+				RemoveConnection(selected, destIndex);
 			}
 		}
 		return index;
+	}
+
+	void RemoveConnection (int from, int to) {
+		string conn = from.ToString() + 'x' + to.ToString();
+		if (!connections.ContainsKey(conn)) return;
+		Destroy(connections[conn].gameObject);
+		connections.Remove(conn);
 	}
 
 	public void SetMemoriesDelete (bool set) {
@@ -169,6 +248,7 @@ public class NodeManager : MonoBehaviour
 		if (CheckInsideNode(pos, ref id)) {
 			selected = id;
 			nodes[id].Lift();
+			GetActiveConnections(id);
 		}
 		return id;
 	}
@@ -182,6 +262,31 @@ public class NodeManager : MonoBehaviour
 		return false;
 	}
 
+	void GetActiveConnections (int nodeID) {
+		activeFromConnections = new List<LineRenderer>();
+		activeToConnections = new List<LineRenderer>();
+		string[] splitConnection;
+		foreach (KeyValuePair<string, LineRenderer> connection in connections) {
+			splitConnection = connection.Key.Split('x');
+			if (splitConnection[0] == nodeID.ToString()) {
+				activeFromConnections.Add(connection.Value);
+			} else if (splitConnection[1] == nodeID.ToString()) {
+				activeToConnections.Add(connection.Value);
+			}
+		}
+	}
+
+	public void MoveConnection (Vector2 position) {
+		for (int i = 0; i < activeFromConnections.Count; ++i) {
+			// For from connections, change the first position.
+			activeFromConnections[i].SetPosition(0, position);
+		}
+		for (int i = 0; i < activeToConnections.Count; ++i) {
+			// For to connections, change the second position.
+			activeToConnections[i].SetPosition(1, position);
+		}
+	}
+
 	public void UpdateAll (int node) {
 		// Destinations
 		if (node == -1) return;
@@ -190,9 +295,7 @@ public class NodeManager : MonoBehaviour
 		nodes[node].node.stringDestinations = new List< MemoryDestination<string> >();
 		nodes[node].node.boolDestinations = new List< MemoryDestination<bool> >();
 		string typeCheck;
-		print(destinations.Count);
 		for (int i = 0; i < destinations.Count; ++i) {
-			print(i);
 			destinations[i].UpdateMemory();
 			typeCheck = destinations[i].currentDest.GetTemplatedType();
 			if (typeCheck == "NONE") {
@@ -202,9 +305,7 @@ public class NodeManager : MonoBehaviour
 			} else if (typeCheck == "String") {
 				nodes[node].node.stringDestinations.Add((MemoryDestination<string>)destinations[i].currentDest); 
 			} else if (typeCheck == "Boolean") {
-				print(destinations[i].currentDest.id);
 				nodes[node].node.boolDestinations.Add((MemoryDestination<bool>)destinations[i].currentDest);
-				print(nodes[node].node.boolDestinations[nodes[node].node.boolDestinations.Count - 1].id);
 			}
 		}
 		nodes[node].node.destTotal = destinations.Count;
