@@ -14,6 +14,7 @@ public class FileTester : MonoBehaviour
     public DialogueMemories memories;
     public RectTransform ScrollChoice;
     public RectTransform ScrollR;
+
     [System.NonSerialized]
     public int logDepth = 0;
 
@@ -26,6 +27,7 @@ public class FileTester : MonoBehaviour
     // List of choices.
     public List<Text> choiceTexts;
     public GameObject DebugText;
+    public GameObject ChoiceButtonPrefab;
     // For enabling/disabling the system at large.
     public GameObject fullSystem;
 
@@ -184,6 +186,7 @@ public class FileTester : MonoBehaviour
                 // Normal node: Set the destination.
                 i = node.destinations[0].dest;
             } else if (node.type == 'e') {
+                ResetChoices();
                 i = -1;
             }
 
@@ -250,49 +253,36 @@ public class FileTester : MonoBehaviour
         speakerBox.text = speaker;
     }
 
-    // Sets each of the choices that need to be set up with their text and making them interactable.
+
+
     public void SetChoices(List<Destination> dests, string speaker)
     {
-        for (i = 0; i < choiceTexts.Count; ++i)
+        i = 0;
+        ScrollChoice.sizeDelta = new Vector2(dests.Count * 350, 0);
+        foreach (Destination choice in dests)
         {
-            if (i >= dests.Count)
-            {
-                choiceTexts[i].text = "";
-                choiceTexts[i].transform.parent.GetComponent<Button>().interactable = false;
-                continue;
-            }
-            choiceTexts[i].text = ReplaceByMemory(currentNodes[dests[i].dest].body);
-            choiceTexts[i].transform.parent.GetComponent<Button>().interactable = true;
+            print(ReplaceByMemory(currentNodes[dests[i].dest].body));
+            GameObject temp = Instantiate(ChoiceButtonPrefab, ScrollChoice);
+            temp.GetComponent<RectTransform>().localPosition = new Vector2(325 * i - 650, 0);
+            temp.GetComponentInChildren<Text>().text = ReplaceByMemory(currentNodes[dests[i].dest].body);
+            int tempInt = i;
+            temp.GetComponent<Button>().onClick.AddListener(() => PlayerChoice(tempInt));
+            i += 1;
         }
+
+
     }
 
 
-    //Make a button Prefab and save it as a variable (assuming a width of 300)
-    //  i = 0
-    //  for choices in dests{
-    //  if ( i + 1 * 80 >= ScrollDest.sizeDelta.x){
-    //      ScrollR.siz
-    //
-    //  }
-    //  choice.GetComponent<RectTransform>().localPosition = new Vector2(325 * i + 50);
-    //  choices.GetComponent<Button>().onClick.AddListener(() => PlayerChoice([i]));
-    //  choices.GetComponent<Text>.text = ReplaceByMemory(currentNodes[dests[i].dest].body);
-    //  i += 1;
-    //}
 
-
-
-
-
-
-    // Turning all choices off.
+    //Destroy all choice buttons
     public void ResetChoices()
     {
-        for (i = 0; i < choiceTexts.Count; ++i)
+        foreach (Transform t in ScrollChoice)
         {
-            choiceTexts[i].text = "";
-            choiceTexts[i].transform.parent.GetComponent<Button>().interactable = false;
+            Destroy(t.gameObject);
         }
+        ScrollChoice.sizeDelta = new Vector2(0, 0);
     }
 
     public void End()
