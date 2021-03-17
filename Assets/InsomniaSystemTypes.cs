@@ -103,7 +103,7 @@ namespace InsomniaSystemTypes {
 		}
 
 		// SetType sets the char type variable. Run when producing the JSON dialogue file.
-		void SetType () {
+		public void SetType () {
 			if (destTotal == 0) {
 				type = 'e';
 			} else if (destTotal == 1) {

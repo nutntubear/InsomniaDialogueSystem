@@ -349,8 +349,13 @@ public class NodeManager : MonoBehaviour
 	void Start () {
 		if (SaveLoad.instance.loadingFile != null) {
 			Node temp;
-			for (int i = 0; i < SaveLoad.instance.loadingFile.Length; ++i) {
-				temp = JsonUtility.FromJson<Node>(SaveLoad.instance.loadingFile[i]);
+			int length = 0;
+			for (int i = 1; i < SaveLoad.instance.loadingFile.Length - 1; ++i) {
+				length = SaveLoad.instance.loadingFile[i].Length - 1;
+				if (i < SaveLoad.instance.loadingFile.Length - 2) {
+					length -= 1;
+				}
+				temp = JsonUtility.FromJson<Node>(SaveLoad.instance.loadingFile[i].Substring(1, length));
 				CreateNode(temp.position);
 				nodes[nodes.Count - 1].node = temp;
 				nodes[nodes.Count - 1].SetText();

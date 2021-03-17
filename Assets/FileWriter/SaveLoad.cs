@@ -27,6 +27,7 @@ public class SaveLoad : MonoBehaviour
 	}
 
 	public string[] loadingFile = null;
+	public string loadedFile = null;
 	ExtensionFilter[] extensions = { new ExtensionFilter("IDS JSON Files", "json") };
 	public bool paused = true;
 	public string editingFile = "";
@@ -68,10 +69,15 @@ public class SaveLoad : MonoBehaviour
 	}
 
 	void Save (string path) {
-		string writeToFile = "";
+		string writeToFile = "[\n";
 		for (int i = 0; i < NodeManager.instance.nodes.Count; ++i) {
-			writeToFile += NodeManager.instance.nodes[i].node.SaveNode() + "\n";
+			writeToFile += "\t" + NodeManager.instance.nodes[i].node.SaveNode();
+			if (i < NodeManager.instance.nodes.Count - 1) {
+				writeToFile += ",";
+			}
+			writeToFile += "\n";
 		}
+		writeToFile += "]";
 		File.WriteAllText(path, writeToFile);
 	}
 
