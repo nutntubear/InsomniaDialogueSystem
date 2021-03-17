@@ -22,6 +22,8 @@ public class MemoryObject : MonoBehaviour
 	static List<Dropdown.OptionData> setAddOperations = new List<Dropdown.OptionData>();
 	static List<Dropdown.OptionData> setOnlyOperations = new List<Dropdown.OptionData>();
 
+	string[] operations = new string[] { "set", "+", "-" };
+
 	public void SwitchType (Dropdown drop) {
 		SwitchByInt(drop.value);
 	}
@@ -32,7 +34,6 @@ public class MemoryObject : MonoBehaviour
 			// If a file is loaded, Start() may never have been run - somehow.
 			Start();
 		}
-		currentMemory.operation = allOperations[memoryOperation.value].text;
 		string memType = currentMemory.GetTemplatedType();
 		if (memType == "NONE") return;
 		if (memType == "Int32") {
@@ -44,6 +45,7 @@ public class MemoryObject : MonoBehaviour
 		} else if (memType == "Boolean") {
 			((Memory<bool>)currentMemory).value = (memoryValueBoolean.value == 0);
 		}
+		currentMemory.operation = memoryOperation.options[Mathf.Max(0, memoryOperation.value)].text;
 	}
 
 	// Switch the UI based on the type of destination given:
@@ -55,6 +57,7 @@ public class MemoryObject : MonoBehaviour
 		memoryValue.gameObject.SetActive(true);
 		memoryValueBoolean.gameObject.SetActive(false);
 		memoryValue.text = "";
+		memoryOperation.value = 0;
 		if (val == 0) {
 			currentMemory = new Memory<int>(currentMemory);
 			memoryValue.contentType = InputField.ContentType.IntegerNumber;
@@ -75,6 +78,7 @@ public class MemoryObject : MonoBehaviour
 		currentMemory = mem;
 		string memType = mem.GetTemplatedType();
 		memoryName.text = mem.key;
+		memoryOperation.value = Mathf.Max(System.Array.IndexOf(operations, mem.operation), 0);
 		if (memType == "Int32") {
 			memoryType.value = 0;
 			memoryValue.text = ((Memory<int>)mem).value.ToString();

@@ -19,6 +19,8 @@ public class DestinationObject : MonoBehaviour
 	static List<Dropdown.OptionData> allChecks = new List<Dropdown.OptionData>();
 	static List<Dropdown.OptionData> equalsOnly = new List<Dropdown.OptionData>();
 
+	string[] checks = new string[] { "=", ">", "<", ">=", "<=" };
+
 	[HideInInspector]
 	public Destination currentDest = new Destination();
 	int destID;
@@ -56,6 +58,7 @@ public class DestinationObject : MonoBehaviour
 	void SwitchByInt (int val) {
 		memoryValue.gameObject.SetActive(true);
 		memoryValueBoolean.gameObject.SetActive(false);
+		check.value = 0;
 		if (val == 0) {
 			currentDest = new Destination(currentDest.dest, currentDest.id);
 			memoryName.text = "";
@@ -98,12 +101,14 @@ public class DestinationObject : MonoBehaviour
 			memoryName.text = temp.memoryKey;
 			memoryValue.text = temp.value.ToString();
 			forceDestination.isOn = temp.forced;
+			check.value = Mathf.Max(System.Array.IndexOf(checks, temp.checkCode), 0);
 		} else if (destinationType == "String") {
 			MemoryDestination<string> temp = new MemoryDestination<string>(dest);
 			memoryType.value = 2;
 			memoryName.text = temp.memoryKey;
 			memoryValue.text = temp.value;
 			forceDestination.isOn = temp.forced;
+			check.value = Mathf.Max(System.Array.IndexOf(checks, temp.checkCode), 0);
 		} else if (destinationType == "Boolean") {
 			MemoryDestination<bool> temp = new MemoryDestination<bool>(dest);
 			memoryType.value = 3;
@@ -114,6 +119,7 @@ public class DestinationObject : MonoBehaviour
 				memoryValueBoolean.value = 1;
 			}
 			forceDestination.isOn = temp.forced;
+			check.value = Mathf.Max(System.Array.IndexOf(checks, temp.checkCode), 0);
 		} else {
 			SwitchByInt(0);
 		}

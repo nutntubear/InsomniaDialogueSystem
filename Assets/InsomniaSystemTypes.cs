@@ -288,7 +288,7 @@ namespace InsomniaSystemTypes {
 	public class MemoryDestination<T> : Destination {
 		public string memoryKey;
 		public T value;
-		public string checkCode = "eq";
+		public string checkCode = "=";
 		public bool forced = false;
 
 		public MemoryDestination (int dest_, int id_, string key="", T val=default(T), string check="=", bool force=false) {
