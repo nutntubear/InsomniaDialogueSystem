@@ -376,6 +376,7 @@ public class NodeManager : MonoBehaviour
 
 	void Start () {
 		if (SaveLoad.instance.loadingFile != null) {
+			TextNode.id = 0;
 			Node temp;
 			int length = 0;
 			for (int i = 1; i < SaveLoad.instance.loadingFile.Length - 1; ++i) {
