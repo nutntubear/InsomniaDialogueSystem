@@ -139,7 +139,7 @@ public class NodeManager : MonoBehaviour
 		destinations.Add(dest);
 		// Add connection.
 		string key = selected.ToString() + 'x' + dest.currentDest.dest.ToString();
-		if (connections[key] != null) {
+		if (connections.ContainsKey(key)) {
 			return;
 		}
 		LineRenderer newConnection = Instantiate(connectionPrefab, transform).transform.GetComponent<LineRenderer>();
