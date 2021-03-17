@@ -139,10 +139,38 @@ public class NodeManager : MonoBehaviour
 		destinations.Add(dest);
 		// Add connection.
 		string key = selected.ToString() + 'x' + dest.currentDest.dest.ToString();
+		if (connections[key] != null) {
+			return;
+		}
 		LineRenderer newConnection = Instantiate(connectionPrefab, transform).transform.GetComponent<LineRenderer>();
 		newConnection.SetPosition(0, nodes[selected].node.position);
 		newConnection.SetPosition(1, nodes[dest.currentDest.dest].node.position);
 		connections[key] = newConnection;
+	}
+
+	public void AddConnection (int from, int to) {
+		string key = from.ToString() + 'x' + to.ToString();
+		LineRenderer newConnection = Instantiate(connectionPrefab, transform).transform.GetComponent<LineRenderer>();
+		newConnection.SetPosition(0, nodes[from].node.position);
+		newConnection.SetPosition(1, nodes[to].node.position);
+		connections[key] = newConnection;
+	}
+
+	public void SetupAllConnections () {
+		for (int i = 0; i < nodes.Count; ++i) {
+			for (int j = 0; j < nodes[i].node.destinations.Count; ++j) {
+				AddConnection(i, nodes[i].node.destinations[j].dest);
+			}
+			for (int j = 0; j < nodes[i].node.intDestinations.Count; ++j) {
+				AddConnection(i, nodes[i].node.intDestinations[j].dest);
+			}
+			for (int j = 0; j < nodes[i].node.stringDestinations.Count; ++j) {
+				AddConnection(i, nodes[i].node.stringDestinations[j].dest);
+			}
+			for (int j = 0; j < nodes[i].node.boolDestinations.Count; ++j) {
+				AddConnection(i, nodes[i].node.boolDestinations[j].dest);
+			}
+		}
 	}
 
 	public int DeleteDestination (Vector2 pos) {
@@ -361,6 +389,7 @@ public class NodeManager : MonoBehaviour
 				nodes[nodes.Count - 1].SetText();
 			}
 			SaveLoad.instance.loadingFile = null;
+			SetupAllConnections();
 		}
 	}
 

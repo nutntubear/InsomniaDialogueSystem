@@ -56,7 +56,7 @@ public class EventObject : MonoBehaviour
 				eventParameter.contentType = InputField.ContentType.IntegerNumber;
 			} else if (val == 2) {
 				currentEvent = new DialogueEventTemplated<string>(currentEvent);
-				eventParameter.contentType = InputField.ContentType.Alphanumeric;
+				eventParameter.contentType = InputField.ContentType.Standard;
 			} else if (val == 3) {
 				currentEvent = new DialogueEventTemplated<bool>(currentEvent);
 				eventParameter.gameObject.SetActive(false);
