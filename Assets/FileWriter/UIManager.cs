@@ -262,16 +262,16 @@ public class UIManager : MonoBehaviour
 			// ...and add the new ones.
 			types = new int[] {0, 0, 0, 0};
 			for (int i = 0; i < node.evTotal; ++i) {
-				if (node.events.Count > 0 && node.events[types[0]].id == i) {
+				if (node.events.Count > types[0] && node.events[types[0]].id == i) {
 					AddEventObject(node.events[types[0]], i);
 					types[0]++;
-				} else if (node.intEvents.Count > 0 && node.intEvents[types[1]].id == i) {
+				} else if (node.intEvents.Count > types[1] && node.intEvents[types[1]].id == i) {
 					AddEventObject(node.intEvents[types[1]], i);
 					types[1]++;
-				} else if (node.stringEvents.Count > 0 && node.stringEvents[types[2]].id == i) {
+				} else if (node.stringEvents.Count > types[2] && node.stringEvents[types[2]].id == i) {
 					AddEventObject(node.stringEvents[types[2]], i);
 					types[2]++;
-				} else if (node.boolEvents.Count > 0 && node.boolEvents[types[3]].id == i) {
+				} else if (node.boolEvents.Count > types[3] && node.boolEvents[types[3]].id == i) {
 					AddEventObject(node.boolEvents[types[3]], i);
 					types[3]++;
 				}
@@ -285,13 +285,13 @@ public class UIManager : MonoBehaviour
 			// Here, types only has three members: int, string, bool.
 			types = new int[] {0, 0, 0};
 			for (int i = 0; i < node.memTotal; ++i) {
-				if (node.intMemories.Count > 0 && node.intMemories[types[0]].id == i) {
+				if (node.intMemories.Count > types[0] && node.intMemories[types[0]].id == i) {
 					AddMemoryObject(node.intMemories[types[0]], i);
 					types[0]++;
-				} else if (node.stringMemories.Count > 0 && node.stringMemories[types[1]].id == i) {
+				} else if (node.stringMemories.Count > types[1] && node.stringMemories[types[1]].id == i) {
 					AddMemoryObject(node.stringMemories[types[1]], i);
 					types[1]++;
-				} else if (node.boolMemories.Count > 0 && node.boolMemories[types[2]].id == i) {
+				} else if (node.boolMemories.Count > types[2] && node.boolMemories[types[2]].id == i) {
 					AddMemoryObject(node.boolMemories[types[2]], i);
 					types[2]++;
 				}

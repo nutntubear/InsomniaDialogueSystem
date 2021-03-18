@@ -58,6 +58,7 @@ public class MemoryObject : MonoBehaviour
 		memoryValueBoolean.gameObject.SetActive(false);
 		memoryValue.text = "";
 		memoryOperation.value = 0;
+		int oldID = currentMemory.id;
 		if (val == 0) {
 			currentMemory = new Memory<int>(currentMemory);
 			memoryValue.contentType = InputField.ContentType.IntegerNumber;
@@ -72,13 +73,13 @@ public class MemoryObject : MonoBehaviour
 			memoryValueBoolean.gameObject.SetActive(true);
 			memoryOperation.options = setOnlyOperations;
 		}
+		currentMemory.id = oldID;
 	}
 
 	public void Setup (MemoryBase mem) {
 		currentMemory = mem;
 		string memType = mem.GetTemplatedType();
 		memoryName.text = mem.key;
-		memoryOperation.value = Mathf.Max(System.Array.IndexOf(operations, mem.operation), 0);
 		if (memType == "Int32") {
 			memoryType.value = 0;
 			memoryValue.text = ((Memory<int>)mem).value.ToString();
@@ -100,6 +101,8 @@ public class MemoryObject : MonoBehaviour
 			}
 			memoryOperation.options = setOnlyOperations;
 		}
+		// Set the value last, since it may be changed when the options change.
+		memoryOperation.value = System.Array.IndexOf(operations, mem.operation);
 	}
 
 	public void SelectForDelete () {

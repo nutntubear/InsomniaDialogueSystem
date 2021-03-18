@@ -44,6 +44,7 @@ public class EventObject : MonoBehaviour
 	void SwitchByInt (int val) {
 		eventParameter.gameObject.SetActive(true);
 		eventParameterBoolean.gameObject.SetActive(false);
+		int oldID = currentEvent.id;
 		if (val == 0) {
 			currentEvent = new DialogueEvent(currentEvent.key);
 			eventParameter.text = "";
@@ -63,6 +64,7 @@ public class EventObject : MonoBehaviour
 				eventParameterBoolean.gameObject.SetActive(true);
 			}
 		}
+		currentEvent.id = oldID;
 	}
 
 	public void Setup (DialogueEvent ev) {
