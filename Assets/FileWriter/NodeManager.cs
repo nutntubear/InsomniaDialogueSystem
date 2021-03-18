@@ -372,6 +372,8 @@ public class NodeManager : MonoBehaviour
 			}
 		}
 		nodes[node].node.memTotal = memories.Count;
+		// Extra Data
+		nodes[node].node.spareData = ui.spareData.text;
 	}
 
 	void Start () {

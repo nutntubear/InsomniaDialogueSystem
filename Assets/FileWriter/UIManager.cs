@@ -40,6 +40,7 @@ public class UIManager : MonoBehaviour
 	public RectTransform memoryList;
 	public RectTransform eventList;
 	public Text destinationGuide;
+	public InputField spareData;
 
 	[Header("Other Settings")]
 	public Color enabledButton;
@@ -215,6 +216,7 @@ public class UIManager : MonoBehaviour
 			nodeID.text = node.id.ToString();
 			speaker.text = node.speaker;
 			body.text = node.body;
+			spareData.text = node.spareData;
 			// Clear destinations...
 			foreach (Transform child in destinationList.transform) {
 				Destroy(child.gameObject);
