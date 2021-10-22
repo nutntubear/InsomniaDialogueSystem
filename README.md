@@ -7,7 +7,7 @@ Currently built in 2020.3.0f1. The Insomnia Dialogue System falls under the MIT 
 ## Features
 - Node based dialogue files, each node containing information like speaker, body text, destinations, events, and flags to be set, saved, or checked.
 - A base dialogue reader to be implemented and customized for your games
-- A visual file writer, allowing for ease of use for writers
+- A visual file writer, allowing for ease of use for writers (find it [here](https://wlyonsgamedev.com/Downloads/InsomniaDialogueSystemFW-v2.zip)!)
 
 ## In Development
 - A rapid file tester packaged with the file writer, allowing for writers to test their files immediately.
